@@ -8,7 +8,7 @@
 #ifndef SCHEDULER_H_
 #define SCHEDULER_H_
 
-#define SDL_MAX_NR_TASKS (32)
+#define SDL_MAX_NR_TASKS (8)
 
 #include "Timestamp.h"
 #include "ID.h"

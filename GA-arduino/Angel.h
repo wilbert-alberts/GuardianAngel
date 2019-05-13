@@ -8,7 +8,7 @@
 #ifndef ANGEL_H_
 #define ANGEL_H_
 
-#define ANG_MAX_NR_ANGELS  (5)
+#define ANG_MAX_NR_ANGELS  (3)
 #define ANG_NUMBERSIZE     (10)
 #define ANG_MESSAGESIZE    (160)
 

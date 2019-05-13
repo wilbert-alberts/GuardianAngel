@@ -14,13 +14,13 @@ void setup(void)
 	Serial.println("Starting");
 	Serial.println("cfg size: ");
 	Serial.println(sizeof(CFG_config));
-//	CFG_init();
-//	CFG_config* cfg = CFG_get();
-//	TMR_init();
-//	SDL_init();
-//	MTN_init();
-//	GRD_init(&cfg->grd_config);
-//	ANG_init(&cfg->ang_config);
+	CFG_init();
+	CFG_config* cfg = CFG_get();
+	TMR_init();
+	SDL_init();
+	MTN_init();
+	GRD_init(&cfg->grd_config);
+	ANG_init(&cfg->ang_config);
 	Serial.println("Started");
 }
 

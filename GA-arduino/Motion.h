@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include "ID.h"
 
-#define MTN_MAX_LISTENERS (10)
+#define MTN_MAX_LISTENERS (5)
 
 typedef void (*MTN_Func)(void* context);
 
