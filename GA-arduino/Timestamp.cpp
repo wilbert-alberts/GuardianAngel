@@ -5,6 +5,7 @@
  *      Author: wilbert
  */
 
+#include <Arduino.h>
 #include "Timestamp.h"
 
 const TS_timestamp TS_never = { 0,0,0,0,0 };
@@ -113,4 +114,17 @@ uint8_t ts_daysInMonth(const TS_timestamp* ts)
 	}
 }
 
+void TS_print(const TS_timestamp* p)
+{
+	Serial.print(p->year);
+	Serial.print("-");
+	Serial.print(p->month+1);
+	Serial.print("-");
+	Serial.print(p->day+1);
 
+	Serial.print(" ");
+	Serial.print(p->hour);
+	Serial.print("-");
+	Serial.print(p->minute);
+
+}

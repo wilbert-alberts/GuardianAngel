@@ -17,5 +17,6 @@ typedef void (*TMR_cb)(void*);
 
 
 void TMR_init();
+// 1 period = 1ms
 ID_id TMR_registerCB(TMR_cb cb, void* context, uint16_t period);
 

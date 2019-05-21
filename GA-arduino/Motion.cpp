@@ -46,17 +46,20 @@ static void mtn_clearListener(mtn_ListenerStruct* listener);
 
 void MTN_init()
 {
+	Serial.println("> MTN_init()");
 	// Initialize listener administration;
-	for (int i=1; i< MTN_MAX_LISTENERS; i++) {
+	for (int i=0; i< MTN_MAX_LISTENERS; i++) {
 		mtn_clearListener(&mtn_listeners[i]);
 	}
 	ID_init(&mtn_nextId);
 
 	// Setup IO (pin, pin direction etc).
 	pinMode(MOTION_PIRPIN, INPUT);
+	mtn_detector.state = MTN_STATE_IDLE;
 
 	// Register motion_tick with 10ms period
 	TMR_registerCB(mtn_tick, NULL, 10);
+	Serial.println("< MTN_init()");
 }
 
 ID_id MTN_addListener(MTN_Func listener, void* context)
@@ -101,6 +104,7 @@ static void mtn_tick(void* context)
 static void mtn_tickWhileIdle(uint8_t motionDetected)
 {
 	if (motionDetected != 0) {
+//		Serial.println("*");
 		for (int i=0; i<MTN_MAX_LISTENERS; i++) {
 			if (mtn_listeners[i].id != 0) {
 				mtn_listeners[i].func(mtn_listeners[i].context);
@@ -117,6 +121,7 @@ static void mtn_tickWhileFired(uint8_t motionDetected)
 		mtn_detector.deadTime--;
 		if (mtn_detector.deadTime == 0) {
 			mtn_detector.state = MTN_STATE_IDLE;
+//			Serial.println('.');
 		}
 	}
 	else {

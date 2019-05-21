@@ -5,6 +5,7 @@
  *      Author: wilbert
  */
 
+#include <Arduino.h>
 #include "Config.h"
 
 #include <stdint.h>
@@ -29,7 +30,9 @@ static void cfg_persistInitialContent();
 
 void CFG_init()
 {
+	Serial.println("> CFG_init()");
 	cfg_readAll();
+	Serial.println("< CFG_init()");
 }
 
 CFG_config* CFG_get()
@@ -46,19 +49,22 @@ static void cfg_readAll()
 {
 	char* cfgPtr = (char*)&cfg_eConfig;
 
+
+	Serial.println("Reading EEPROM config header.");
+	EEPROM.get(0, cfg_eConfig);
+	Serial.println("Finished reading EEPROM config content.");
+
 	for (uint16_t a=0; a<8; a++) {
-		char ch = EEPROM.read(a);
-		cfgPtr[a] = ch;
-		cfgPtr++;
+		char ch = cfgPtr[a];
+//		Serial.print(a);
+//		Serial.print(": ");
+//		Serial.println(ch);
+
 		if (ch != cfg_expectedMagic[a]) {
+			Serial.println("No valid content found.");
 			cfg_persistInitialContent();
 			return;
 		}
-	}
-	for (uint16_t a=8; a< sizeof(cfg_eConfig); a++) {
-		char ch = EEPROM.read(a);
-		cfgPtr[a] = ch;
-		cfgPtr++;
 	}
 }
 
@@ -77,10 +83,11 @@ static void cfg_persistInitialContent()
 
 static void cfg_writeAll()
 {
+
 	char* cfgPtr = (char*)&cfg_eConfig;
 	cfg_eConfig.nrPersist++;
 
-	for (uint16_t a=0; a< sizeof(cfg_eConfig); a++) {
-		EEPROM.write(a, cfgPtr[a]);
-	}
+	Serial.print("Writing EEPROM config, ");
+	EEPROM.put(0, cfg_eConfig);
+	Serial.println("done.");
 }

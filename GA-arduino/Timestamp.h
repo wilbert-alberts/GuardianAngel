@@ -37,5 +37,6 @@ void TS_addMonths(TS_timestamp* ts, uint16_t months);
 void TS_addYears(TS_timestamp* ts, uint16_t years);
 int8_t TS_compare(const TS_timestamp* left, const TS_timestamp* right); // Determine left - right
 
+void TS_print(const TS_timestamp* p);
 
 #endif /* TIMESTAMP_H_ */

@@ -4,6 +4,7 @@
  *  Created on: 23 apr. 2019
  *      Author: wilbert
  */
+#include <Arduino.h>
 
 #include "GuardTask.h"
 
@@ -40,10 +41,12 @@ static void grd_clearTask(grd_TaskStruct* task);
 
 void GRD_init(GRD_config* config)
 {
+	Serial.println("> GRD_init()");
 	for (uint8_t i=1; i< GRD_MAX_TASKS; i++) {
 		grd_clearTask(&grd_tasks[i]);
 		grd_tasks[i].cfg = &config->tasks[i];
 	}
+	Serial.println("< GRD_init()");
 }
 
 void GRD_createTask(GRD_TaskCfgStruct* taskCfg)
@@ -72,7 +75,12 @@ void GRD_getInitialConfig(GRD_config* cfg)
 
 static void grd_startTask(void* context)
 {
+	TS_timestamp now;
 	grd_TaskStruct* task = (grd_TaskStruct*)context;
+
+	Serial.println("> grd_startTask()");
+	SDL_getTime(&now);
+	TS_print(&now);
 
 	task->motionsDetected = 0;
 	task->state = GRD_TASKSTATE_ACTIVE;
@@ -82,11 +90,18 @@ static void grd_startTask(void* context)
 	TS_timestamp stop = grd_determineNextHHMM(&task->cfg->stop);
 
 	task->schedTaskId = SDL_addTask(&stop, grd_stopTask, context);
+
+	Serial.println("< grd_startTask()");
 }
 
 static void grd_stopTask(void* context)
 {
+	TS_timestamp now;
 	grd_TaskStruct* task = (grd_TaskStruct*)context;
+
+	Serial.println("> grd_stopTask()");
+	SDL_getTime(&now);
+	TS_print(&now);
 
 	// Stop listening.
 	MTN_removeListener(task->motionListenerId);
@@ -100,16 +115,24 @@ static void grd_stopTask(void* context)
 	TS_timestamp start = grd_determineNextHHMM(&task->cfg->start);
 
 	task->schedTaskId = SDL_addTask(&start, grd_startTask, context);
+	Serial.println("< grd_stopTask()");
 }
 
 static void grd_motionDetected(void* context)
 {
 	grd_TaskStruct* task = (grd_TaskStruct*)context;
+	TS_timestamp now;
 
-	// Increase detected motions, but avoid rollover
+	Serial.println("> grd_motionDetected()");
+	SDL_getTime(&now);
+
+	TS_print(&now);	// Increase detected motions, but avoid rollover
 	if (task->motionsDetected <255)
 		task->motionsDetected++;
+
+	Serial.println("< grd_stopTask()");
 }
+
 
 static TS_timestamp grd_determineNextHHMM(const TS_HHmm* hhmm)
 {
@@ -141,8 +164,4 @@ static void grd_clearTask(grd_TaskStruct* task)
 	task->state = GRD_TASKSTATE_EMPTY;
 	task->schedTaskId= ID_NULL;
 	task->motionListenerId= ID_NULL;
-
-	for (uint8_t i=1; i< GRD_MAX_TASKS; i++) {
-		grd_tasks[i] = grd_tasks[0];
-	}
 }

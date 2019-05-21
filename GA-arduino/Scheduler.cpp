@@ -5,6 +5,7 @@
  *      Author: wilbert
  */
 
+#include <Arduino.h>
 #include <stdlib.h>
 
 #include "Timestamp.h"
@@ -30,6 +31,7 @@ static void sdl_handleTasks();
 static void sdl_syncTime(void* context);
 
 void SDL_init() {
+	Serial.println("> SDL_init()");
 	for (uint8_t i = 1; i < SDL_MAX_NR_TASKS; i++) {
 		sdl_clearTask(&sdl_tasks[i]);
 	}
@@ -37,6 +39,7 @@ void SDL_init() {
 	sdl_setTime();
 	sdl_syncTime(NULL);
 	TMR_registerCB(sdl_tick, NULL, 1000);
+	Serial.println("< SDL_init()");
 }
 
 ID_id SDL_addTask(const TS_timestamp* moment, SDL_taskFunc task, void* context) {
@@ -70,6 +73,8 @@ static void sdl_tick(void* context) {
 	if (sdl_seconds == 60) {
 		sdl_seconds = 0;
 		TS_addMinutes(&sdl_now, 1);
+		TS_print(&sdl_now);
+		Serial.println ("");
 		sdl_handleTasks();
 	}
 }
