@@ -24,7 +24,7 @@ static tmr_callbackStruct tmr_callbacks[TMR_MAX_NR_CALLBACKS];
 static ID_id tmr_callbackID;
 
 void TMR_init() {
-	Serial.println("> TMR_init()");
+	Serial.println(F("> TMR_init()"));
 	for (uint8_t i = 0; i < TMR_MAX_NR_CALLBACKS; i++) {
 		tmr_callbacks[i].id = ID_NULL;
 		tmr_callbacks[i].period = 0;
@@ -37,7 +37,7 @@ void TMR_init() {
 //	Timer1.initialize(1000);
 	Timer1.initialize(50);
 	Timer1.attachInterrupt(tmr_msCB);
-	Serial.println("< TMR_init()");
+	Serial.println(F("< TMR_init()"));
 }
 
 ID_id TMR_registerCB(TMR_cb cb, void* context, uint16_t period) {

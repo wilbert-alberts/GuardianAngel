@@ -23,23 +23,23 @@ static SDL_taskStruct sdl_tasks[SDL_MAX_NR_TASKS];
 static ID_id sdl_taskId;
 static TS_timestamp sdl_now;
 static uint8_t sdl_seconds;
+static bool sdl_ticking;
 
-static void sdl_setTime();
+static void sdl_initTime();
 static void sdl_tick(void* context);
 static void sdl_clearTask(SDL_taskStruct* task);
 static void sdl_handleTasks();
-static void sdl_syncTime(void* context);
 
 void SDL_init() {
-	Serial.println("> SDL_init()");
+	Serial.println(F("> SDL_init()"));
 	for (uint8_t i = 1; i < SDL_MAX_NR_TASKS; i++) {
 		sdl_clearTask(&sdl_tasks[i]);
 	}
 
-	sdl_setTime();
-	sdl_syncTime(NULL);
+	sdl_initTime();
 	TMR_registerCB(sdl_tick, NULL, 1000);
-	Serial.println("< SDL_init()");
+	sdl_ticking = true;
+	Serial.println(F("< SDL_init()"));
 }
 
 ID_id SDL_addTask(const TS_timestamp* moment, SDL_taskFunc task, void* context) {
@@ -68,33 +68,45 @@ void SDL_removeTask(ID_id task) {
 	}
 }
 
+uint8_t SDL_setTime(const TS_timestamp* now, uint8_t secs) {
+	if (TS_compare(&sdl_now, now) > 0) {
+		sdl_now = *now;
+		sdl_seconds = secs;
+		sdl_ticking = true;
+		return 0;
+	}
+
+	if ((TS_compare(&sdl_now, now) == 0) && (secs > sdl_seconds)) {
+		sdl_seconds = secs;
+		sdl_ticking= true;
+		return 0;
+	}
+
+	Serial.println(F("= SDL_setTime: trying to go back in time, stop ticking"));
+	sdl_ticking = false;
+	return -1;
+}
+
 static void sdl_tick(void* context) {
-	sdl_seconds++;
-	if (sdl_seconds == 60) {
-		sdl_seconds = 0;
-		TS_addMinutes(&sdl_now, 1);
-		TS_print(&sdl_now);
-		Serial.println ("");
-		sdl_handleTasks();
+	if (sdl_ticking) {
+		sdl_seconds++;
+		if (sdl_seconds == 60) {
+			sdl_seconds = 0;
+			TS_addMinutes(&sdl_now, 1);
+			TS_print(&sdl_now);
+			Serial.println(F(""));
+			sdl_handleTasks();
+		}
 	}
 }
 
-static void sdl_setTime() {
-	sdl_now.year = 2019;
-	sdl_now.month = 11;
-	sdl_now.day = 11;
-	sdl_now.hour = 16;
-	sdl_now.minute = 33;
+static void sdl_initTime() {
+	sdl_now.year = 2000;
+	sdl_now.month = 0;
+	sdl_now.day = 0;
+	sdl_now.hour = 0;
+	sdl_now.minute = 0;
 	sdl_seconds = 0;
-}
-
-static void sdl_syncTime(void* context) {
-	// Sync time and wait
-
-	// Schedule next sync task
-	TS_timestamp when = sdl_now;
-	TS_addDays(&when, 1);
-	SDL_addTask(&when, sdl_syncTime, NULL);
 }
 
 static void sdl_handleTasks() {

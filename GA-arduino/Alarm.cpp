@@ -5,6 +5,10 @@
  *      Author: wilbert
  */
 
+void ALM_init()
+{
+}
+
 void AL_raiseAlarm()
 {
 

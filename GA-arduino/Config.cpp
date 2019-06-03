@@ -22,7 +22,7 @@ typedef struct
 
 static cfg_EConfigStruct cfg_eConfig;
 
-static char cfg_expectedMagic[8] = "WALB+BEN";
+static char cfg_expectedMagic[9] = "WALB+BEN";
 
 static void cfg_readAll();
 static void cfg_writeAll();
@@ -30,9 +30,9 @@ static void cfg_persistInitialContent();
 
 void CFG_init()
 {
-	Serial.println("> CFG_init()");
+	Serial.println(F("> CFG_init()"));
 	cfg_readAll();
-	Serial.println("< CFG_init()");
+	Serial.println(F("< CFG_init()"));
 }
 
 CFG_config* CFG_get()
@@ -50,9 +50,9 @@ static void cfg_readAll()
 	char* cfgPtr = (char*)&cfg_eConfig;
 
 
-	Serial.println("Reading EEPROM config header.");
+	Serial.println(F("Reading EEPROM config header."));
 	EEPROM.get(0, cfg_eConfig);
-	Serial.println("Finished reading EEPROM config content.");
+	Serial.println(F("Finished reading EEPROM config content."));
 
 	for (uint16_t a=0; a<8; a++) {
 		char ch = cfgPtr[a];
@@ -61,7 +61,7 @@ static void cfg_readAll()
 //		Serial.println(ch);
 
 		if (ch != cfg_expectedMagic[a]) {
-			Serial.println("No valid content found.");
+			Serial.println(F("No valid content found."));
 			cfg_persistInitialContent();
 			return;
 		}
@@ -89,5 +89,5 @@ static void cfg_writeAll()
 
 	Serial.print("Writing EEPROM config, ");
 	EEPROM.put(0, cfg_eConfig);
-	Serial.println("done.");
+	Serial.println(F("done."));
 }

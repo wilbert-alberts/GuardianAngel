@@ -19,7 +19,7 @@ typedef char* GSM_Message;
 typedef  void (*ReceiveCB)(GSM_Number number, GSM_Message message);
 
 void GSM_init();
-void GSM_getTime(TS_timestamp* ts);
+void GSM_getTime(TS_timestamp* ts, uint8_t* seconds);
 void GSM_sendSMS(GSM_Number number, GSM_Message message);
 void GSM_registerReceiveCB(ReceiveCB cb);
 

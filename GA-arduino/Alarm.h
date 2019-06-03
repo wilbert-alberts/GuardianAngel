@@ -8,6 +8,8 @@
 #ifndef ALARM_H_
 #define ALARM_H_
 
-void AL_raiseAlarm();
+void ALM_init();
+void ALM_raiseAlarm();
+
 
 #endif /* ALARM_H_ */

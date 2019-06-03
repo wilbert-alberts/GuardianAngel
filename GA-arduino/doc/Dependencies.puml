@@ -1,0 +1,20 @@
+@startuml
+
+GuardTask ..> Scheduler
+ClockSync ..> Scheduler
+Scheduler ..> Timer
+Motion ..> Timer
+GuardTask ..> Alarm
+GuardTask ..> Motion
+ClockSync ..> GSM
+
+Alarm ..> Angel
+Angel ..> GSM
+
+
+Scheduler ..> Timestamp
+GuardTask ..> Timestamp
+SimMgr ..> Scheduler
+SimMgr ..> GSM
+
+@enduml

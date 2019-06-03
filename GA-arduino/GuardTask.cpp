@@ -41,12 +41,12 @@ static void grd_clearTask(grd_TaskStruct* task);
 
 void GRD_init(GRD_config* config)
 {
-	Serial.println("> GRD_init()");
+	Serial.println(F("> GRD_init()"));
 	for (uint8_t i=1; i< GRD_MAX_TASKS; i++) {
 		grd_clearTask(&grd_tasks[i]);
 		grd_tasks[i].cfg = &config->tasks[i];
 	}
-	Serial.println("< GRD_init()");
+	Serial.println(F("< GRD_init()"));
 }
 
 void GRD_createTask(GRD_TaskCfgStruct* taskCfg)
@@ -78,7 +78,7 @@ static void grd_startTask(void* context)
 	TS_timestamp now;
 	grd_TaskStruct* task = (grd_TaskStruct*)context;
 
-	Serial.println("> grd_startTask()");
+	Serial.println(F("> grd_startTask()"));
 	SDL_getTime(&now);
 	TS_print(&now);
 
@@ -91,7 +91,7 @@ static void grd_startTask(void* context)
 
 	task->schedTaskId = SDL_addTask(&stop, grd_stopTask, context);
 
-	Serial.println("< grd_startTask()");
+	Serial.println(F("< grd_startTask()"));
 }
 
 static void grd_stopTask(void* context)
@@ -99,7 +99,7 @@ static void grd_stopTask(void* context)
 	TS_timestamp now;
 	grd_TaskStruct* task = (grd_TaskStruct*)context;
 
-	Serial.println("> grd_stopTask()");
+	Serial.println(F("> grd_stopTask()"));
 	SDL_getTime(&now);
 	TS_print(&now);
 
@@ -108,14 +108,14 @@ static void grd_stopTask(void* context)
 
 	// Check whether we need to send alarm.
 	if (task->motionsDetected < task->cfg->minMotion) {
-		AL_raiseAlarm();
+		ALM_raiseAlarm();
 	}
 
 	// Determine moment to restart task
 	TS_timestamp start = grd_determineNextHHMM(&task->cfg->start);
 
 	task->schedTaskId = SDL_addTask(&start, grd_startTask, context);
-	Serial.println("< grd_stopTask()");
+	Serial.println(F("< grd_stopTask()"));
 }
 
 static void grd_motionDetected(void* context)
@@ -123,14 +123,14 @@ static void grd_motionDetected(void* context)
 	grd_TaskStruct* task = (grd_TaskStruct*)context;
 	TS_timestamp now;
 
-	Serial.println("> grd_motionDetected()");
+	Serial.println(F("> grd_motionDetected()"));
 	SDL_getTime(&now);
 
 	TS_print(&now);	// Increase detected motions, but avoid rollover
 	if (task->motionsDetected <255)
 		task->motionsDetected++;
 
-	Serial.println("< grd_stopTask()");
+	Serial.println(F("< grd_stopTask()"));
 }
 
 
