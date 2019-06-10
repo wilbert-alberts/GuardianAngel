@@ -29,11 +29,7 @@ typedef struct
 	ang_AngelStruct angels[ANG_MAX_NR_ANGELS];
 } ANG_config;
 
-void ANG_init(ANG_config* cfg);
-void ANG_add(char* number, char* message);
-void ANG_remove(char* number);
-void ANG_passive(char* number);
-void ANG_active(char* number);
-void ANG_getInitialConfig(ANG_config* cfg);
+void ANG_init();
+
 
 #endif /* ANGEL_H_ */

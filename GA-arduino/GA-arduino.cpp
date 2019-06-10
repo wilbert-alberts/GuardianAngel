@@ -21,19 +21,18 @@ void setup(void)
 	Serial.begin(115200);
 	LOG("Starting.");
 	CFG_init();
-	CFG_config* cfg = CFG_get();
 
 	GSM_init();
 
 	TMR_init();
-//	ANG_init(&cfg->ang_config);
+	ANG_init();
 
 	MTN_init();
 	SDL_init();
 	ALM_init();
 
 
-//	GRD_init(&cfg->grd_config);
+	GRD_init();
 	CKS_init();
 //	SIM_init();
 	LOG("Started.");

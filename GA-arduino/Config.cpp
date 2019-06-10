@@ -22,12 +22,12 @@ typedef struct
 } cfg_EConfigStruct;
 
 static cfg_EConfigStruct cfg_eConfig;
+static bool cfg_cfgRead = false;
+
 
 static char cfg_expectedMagic[9] = "WALB+BEN";
 
 static void cfg_readAll();
-static void cfg_writeAll();
-static void cfg_persistInitialContent();
 
 void CFG_init()
 {
@@ -36,15 +36,28 @@ void CFG_init()
 	LOG_exit("CFG_init()");
 }
 
-CFG_config* CFG_get()
+bool CFG_getCfgAng(ANG_config** ang_config)
 {
-	return &cfg_eConfig.config;
+	*ang_config = &cfg_eConfig.config.ang_config;
+	return cfg_cfgRead;
+}
+
+bool CFG_getCfgGrd(GRD_config** grd_config)
+{
+	*grd_config = &cfg_eConfig.config.grd_config;
+	return cfg_cfgRead;
 }
 
 void CFG_persist()
 {
 	LOG_entry("CFG_persist()");
-	cfg_writeAll();
+	char* cfgPtr = (char*)&cfg_eConfig;
+	cfg_eConfig.nrPersist++;
+
+	LOG("cfg_writeAll(): writing EEPROM.");
+	EEPROM.put(0, cfg_eConfig);
+	LOG("cfg_writeAll(): writing EEPROM done.");
+
 	LOG_exit("CFG_persist()");
 }
 
@@ -66,38 +79,14 @@ static void cfg_readAll()
 
 		if (ch != cfg_expectedMagic[a]) {
 			LOG("cfg_readAll(): Invalid header.");
-			cfg_persistInitialContent();
+			cfg_cfgRead = false;
 			LOG_exit("cfg_readAll()");
 			return;
 		}
 	}
+	LOG("cfg_readAll(): config succesfully read.");
+	cfg_cfgRead = true;
 	LOG_exit("cfg_readAll()");
 }
 
-static void cfg_persistInitialContent()
-{
-	LOG_entry("cfg_persistInitialContent()");
-	for (uint16_t a=0; a<8; a++) {
-		cfg_eConfig.magicNr[a] = cfg_expectedMagic[a];
-	}
-	cfg_eConfig.versionNr = CFG_VERSION;
-	cfg_eConfig.nrPersist = 0;
-	ANG_getInitialConfig(&(cfg_eConfig.config.ang_config));
-	GRD_getInitialConfig(&(cfg_eConfig.config.grd_config));
 
-	cfg_writeAll();
-	LOG_exit("cfg_persistInitialContent()");
-}
-
-static void cfg_writeAll()
-{
-	LOG_entry("cfg_writeAll()");
-
-	char* cfgPtr = (char*)&cfg_eConfig;
-	cfg_eConfig.nrPersist++;
-
-	LOG("cfg_writeAll(): writing EEPROM.");
-	EEPROM.put(0, cfg_eConfig);
-	LOG("cfg_writeAll(): writing EEPROM done.");
-	LOG_exit("cfg_writeAll()");
-}

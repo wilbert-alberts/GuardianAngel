@@ -17,4 +17,7 @@ GuardTask ..> Timestamp
 SimMgr ..> Scheduler
 SimMgr ..> GSM
 
+Angel ..> CFG
+GuardTask ..> CFG
+
 @enduml

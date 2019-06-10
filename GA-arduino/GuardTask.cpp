@@ -12,6 +12,7 @@
 #include "ID.h"
 #include "Motion.h"
 #include "Alarm.h"
+#include "Config.h"
 
 typedef enum grd_TaskStateEnum
 {
@@ -30,6 +31,7 @@ typedef struct grd_TaskStruct
 	ID_id             motionListenerId;
 } grd_TaskStruct;
 
+static GRD_config* grd_cfg;
 
 static grd_TaskStruct grd_tasks[GRD_MAX_TASKS];
 
@@ -37,15 +39,28 @@ static void grd_startTask(void* context);
 static void grd_stopTask(void* context);
 static void grd_motionDetected(void* context);
 static TS_timestamp grd_determineNextHHMM(const TS_HHmm* hhmm);
+static void grd_clearTaskCfg(GRD_TaskCfgStruct* cfg);
 static void grd_clearTask(grd_TaskStruct* task);
 
-void GRD_init(GRD_config* config)
+void GRD_init()
 {
 	LOG_entry("GRD_init()");
+
 	for (uint8_t i=1; i< GRD_MAX_TASKS; i++) {
 		grd_clearTask(&grd_tasks[i]);
-		grd_tasks[i].cfg = &config->tasks[i];
 	}
+
+	if (!CFG_getCfgGrd(&grd_cfg)) {
+		for (uint8_t i=1; i< GRD_MAX_TASKS; i++) {
+			grd_clearTaskCfg(grd_tasks[i].cfg);
+		}
+		CFG_persist();
+	}
+
+	for (uint8_t i=1; i< GRD_MAX_TASKS; i++) {
+		grd_tasks[i].cfg = &grd_cfg->tasks[i];
+	}
+
 	LOG_exit("GRD_init()");
 }
 
@@ -67,13 +82,6 @@ void GRD_createTask(GRD_TaskCfgStruct* taskCfg)
 		}
 	}
 	LOG("GRD_createTask(): unable to create task, out of free slots.")
-}
-
-void GRD_getInitialConfig(GRD_config* cfg)
-{
-	LOG_entry("GRD_getInitialConfig");
-	GRD_init(cfg);
-	LOG_exit("GRD_getInitialConfig");
 }
 
 static void grd_startTask(void* context)
@@ -157,14 +165,19 @@ static TS_timestamp grd_determineNextHHMM(const TS_HHmm* hhmm)
 }
 
 
+static void grd_clearTaskCfg(GRD_TaskCfgStruct* cfg)
+{
+	cfg->start.hour = 0;
+	cfg->start.minute = 0;
+	cfg->stop = grd_tasks[0].cfg->start;
+	cfg->minMotion = 255;
+}
+
 static void grd_clearTask(grd_TaskStruct* task)
 {
-	task->cfg->start.hour = 0;
-	task->cfg->start.minute = 0;
-	task->cfg->stop = grd_tasks[0].cfg->start;
-	task->cfg->minMotion = 255;
 	task->motionsDetected = 0;
 	task->state = GRD_TASKSTATE_EMPTY;
 	task->schedTaskId= ID_NULL;
 	task->motionListenerId= ID_NULL;
+	task->cfg = NULL;
 }

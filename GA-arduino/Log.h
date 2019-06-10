@@ -8,6 +8,9 @@
 #ifndef LOG_H_
 #define LOG_H_
 
+#include <Arduino.h>
+#include <Print.h>
+
 #define _log(x) Serial.println(F(x));
 
 #define LOG_entry(x) Serial.print(F("> ")); \

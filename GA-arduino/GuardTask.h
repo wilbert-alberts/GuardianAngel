@@ -24,8 +24,7 @@ typedef struct
 	GRD_TaskCfgStruct tasks[GRD_MAX_TASKS];
 } GRD_config;
 
-void GRD_init(GRD_config* config);
+void GRD_init();
 void GRD_createTask(GRD_TaskCfgStruct* taskCfg);
-void GRD_getInitialConfig(GRD_config* cfg);
 
 #endif /* GUARDTASK_H_ */

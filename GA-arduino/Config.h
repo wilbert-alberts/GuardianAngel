@@ -17,12 +17,12 @@ typedef struct
 {
 	ANG_config ang_config;
 	GRD_config grd_config;
-
 } CFG_config;
 
 
 void CFG_init();
-CFG_config* CFG_get();
 void CFG_persist();
+bool CFG_getCfgAng(ANG_config** ang_config);
+bool CFG_getCfgGrd(GRD_config** grd_config);
 
 #endif /* CONFIG_H_ */
