@@ -10,7 +10,7 @@
 
 #include <stdlib.h>
 #include "Arduino.h"
-
+#include "Log.h"
 
 #define MOTION_DEADTIME (10)
 #define MOTION_PIRPIN   (5)
@@ -46,7 +46,7 @@ static void mtn_clearListener(mtn_ListenerStruct* listener);
 
 void MTN_init()
 {
-	Serial.println(F("> MTN_init()"));
+	LOG_entry("MTN_init()");
 	// Initialize listener administration;
 	for (int i=0; i< MTN_MAX_LISTENERS; i++) {
 		mtn_clearListener(&mtn_listeners[i]);
@@ -59,13 +59,13 @@ void MTN_init()
 
 	// Register motion_tick with 10ms period
 	TMR_registerCB(mtn_tick, NULL, 10);
-	Serial.println(F("< MTN_init()"));
+	LOG_entry("MTN_exit()");
 }
 
 ID_id MTN_addListener(MTN_Func listener, void* context)
 {
 	for (int i=0; i< MTN_MAX_LISTENERS; i++) {
-		if (mtn_listeners[i].id == 0) {
+		if (mtn_listeners[i].id == ID_NULL) {
 			mtn_listeners[i].id = ID_getNext(&mtn_nextId);
 			mtn_listeners[i].func = listener;
 			mtn_listeners[i].context = context;
@@ -73,6 +73,7 @@ ID_id MTN_addListener(MTN_Func listener, void* context)
 		}
 	}
 	// Error: unable to add listener; no free slot;
+	LOG("MTN_addListener(): unable to add listener, out of free slots.");
 	return 0;
 }
 
@@ -104,7 +105,6 @@ static void mtn_tick(void* context)
 static void mtn_tickWhileIdle(uint8_t motionDetected)
 {
 	if (motionDetected != 0) {
-//		Serial.println(F("*"));
 		for (int i=0; i<MTN_MAX_LISTENERS; i++) {
 			if (mtn_listeners[i].id != 0) {
 				mtn_listeners[i].func(mtn_listeners[i].context);
@@ -121,7 +121,6 @@ static void mtn_tickWhileFired(uint8_t motionDetected)
 		mtn_detector.deadTime--;
 		if (mtn_detector.deadTime == 0) {
 			mtn_detector.state = MTN_STATE_IDLE;
-//			Serial.println('.');
 		}
 	}
 	else {

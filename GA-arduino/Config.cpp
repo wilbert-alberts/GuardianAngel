@@ -7,6 +7,7 @@
 
 #include <Arduino.h>
 #include "Config.h"
+#include "Log.h"
 
 #include <stdint.h>
 #include <EEPROM.h>
@@ -30,9 +31,9 @@ static void cfg_persistInitialContent();
 
 void CFG_init()
 {
-	Serial.println(F("> CFG_init()"));
+	LOG_entry("CFG_init()");
 	cfg_readAll();
-	Serial.println(F("< CFG_init()"));
+	LOG_exit("CFG_init()");
 }
 
 CFG_config* CFG_get()
@@ -42,17 +43,20 @@ CFG_config* CFG_get()
 
 void CFG_persist()
 {
+	LOG_entry("CFG_persist()");
 	cfg_writeAll();
+	LOG_exit("CFG_persist()");
 }
 
 static void cfg_readAll()
 {
 	char* cfgPtr = (char*)&cfg_eConfig;
 
+	LOG_entry("cfg_readAll()");
 
-	Serial.println(F("Reading EEPROM config header."));
+	LOG("cfg_readAll(): Reading EEPROM content.");
 	EEPROM.get(0, cfg_eConfig);
-	Serial.println(F("Finished reading EEPROM config content."));
+	LOG("cfg_readAll(): Reading EEPROM content ready.");
 
 	for (uint16_t a=0; a<8; a++) {
 		char ch = cfgPtr[a];
@@ -61,15 +65,18 @@ static void cfg_readAll()
 //		Serial.println(ch);
 
 		if (ch != cfg_expectedMagic[a]) {
-			Serial.println(F("No valid content found."));
+			LOG("cfg_readAll(): Invalid header.");
 			cfg_persistInitialContent();
+			LOG_exit("cfg_readAll()");
 			return;
 		}
 	}
+	LOG_exit("cfg_readAll()");
 }
 
 static void cfg_persistInitialContent()
 {
+	LOG_entry("cfg_persistInitialContent()");
 	for (uint16_t a=0; a<8; a++) {
 		cfg_eConfig.magicNr[a] = cfg_expectedMagic[a];
 	}
@@ -79,15 +86,18 @@ static void cfg_persistInitialContent()
 	GRD_getInitialConfig(&(cfg_eConfig.config.grd_config));
 
 	cfg_writeAll();
+	LOG_exit("cfg_persistInitialContent()");
 }
 
 static void cfg_writeAll()
 {
+	LOG_entry("cfg_writeAll()");
 
 	char* cfgPtr = (char*)&cfg_eConfig;
 	cfg_eConfig.nrPersist++;
 
-	Serial.print("Writing EEPROM config, ");
+	LOG("cfg_writeAll(): writing EEPROM.");
 	EEPROM.put(0, cfg_eConfig);
-	Serial.println(F("done."));
+	LOG("cfg_writeAll(): writing EEPROM done.");
+	LOG_exit("cfg_writeAll()");
 }

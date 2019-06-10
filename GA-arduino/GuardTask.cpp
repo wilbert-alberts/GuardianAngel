@@ -7,7 +7,7 @@
 #include <Arduino.h>
 
 #include "GuardTask.h"
-
+#include "Log.h"
 #include "Scheduler.h"
 #include "ID.h"
 #include "Motion.h"
@@ -41,12 +41,12 @@ static void grd_clearTask(grd_TaskStruct* task);
 
 void GRD_init(GRD_config* config)
 {
-	Serial.println(F("> GRD_init()"));
+	LOG_entry("GRD_init()");
 	for (uint8_t i=1; i< GRD_MAX_TASKS; i++) {
 		grd_clearTask(&grd_tasks[i]);
 		grd_tasks[i].cfg = &config->tasks[i];
 	}
-	Serial.println(F("< GRD_init()"));
+	LOG_exit("GRD_init()");
 }
 
 void GRD_createTask(GRD_TaskCfgStruct* taskCfg)
@@ -63,14 +63,17 @@ void GRD_createTask(GRD_TaskCfgStruct* taskCfg)
 
 			// Schedule start task
 			grd_tasks[i].schedTaskId = SDL_addTask(&start, grd_startTask, &grd_tasks[i]);
-			break;
+			return;
 		}
 	}
+	LOG("GRD_createTask(): unable to create task, out of free slots.")
 }
 
 void GRD_getInitialConfig(GRD_config* cfg)
 {
+	LOG_entry("GRD_getInitialConfig");
 	GRD_init(cfg);
+	LOG_exit("GRD_getInitialConfig");
 }
 
 static void grd_startTask(void* context)
@@ -78,7 +81,7 @@ static void grd_startTask(void* context)
 	TS_timestamp now;
 	grd_TaskStruct* task = (grd_TaskStruct*)context;
 
-	Serial.println(F("> grd_startTask()"));
+	LOG_entry("grd_startTask()");
 	SDL_getTime(&now);
 	TS_print(&now);
 
@@ -91,7 +94,7 @@ static void grd_startTask(void* context)
 
 	task->schedTaskId = SDL_addTask(&stop, grd_stopTask, context);
 
-	Serial.println(F("< grd_startTask()"));
+	LOG_exit("grd_startTask()");
 }
 
 static void grd_stopTask(void* context)
@@ -99,7 +102,7 @@ static void grd_stopTask(void* context)
 	TS_timestamp now;
 	grd_TaskStruct* task = (grd_TaskStruct*)context;
 
-	Serial.println(F("> grd_stopTask()"));
+	LOG_entry("grd_stopTask()");
 	SDL_getTime(&now);
 	TS_print(&now);
 
@@ -115,7 +118,7 @@ static void grd_stopTask(void* context)
 	TS_timestamp start = grd_determineNextHHMM(&task->cfg->start);
 
 	task->schedTaskId = SDL_addTask(&start, grd_startTask, context);
-	Serial.println(F("< grd_stopTask()"));
+	LOG_exit("grd_stopTask()");
 }
 
 static void grd_motionDetected(void* context)
@@ -123,14 +126,14 @@ static void grd_motionDetected(void* context)
 	grd_TaskStruct* task = (grd_TaskStruct*)context;
 	TS_timestamp now;
 
-	Serial.println(F("> grd_motionDetected()"));
+	LOG_entry("grd_motionDetected()");
 	SDL_getTime(&now);
 
 	TS_print(&now);	// Increase detected motions, but avoid rollover
 	if (task->motionsDetected <255)
 		task->motionsDetected++;
 
-	Serial.println(F("< grd_stopTask()"));
+	LOG_exit("grd_motionDetected()");
 }
 
 

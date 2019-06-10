@@ -10,6 +10,7 @@
 #include "GSM.h"
 #include "Alarm.h"
 #include "ClockSync.h"
+#include "Log.h"
 
 static void Callback(void*);
 
@@ -18,9 +19,7 @@ void setup(void)
 	TS_timestamp moment;
 
 	Serial.begin(115200);
-	Serial.println(F("Starting\n"));
-	Serial.print("cfg size: ");
-	Serial.println(sizeof(CFG_config));
+	LOG("Starting.");
 	CFG_init();
 	CFG_config* cfg = CFG_get();
 
@@ -37,7 +36,7 @@ void setup(void)
 //	GRD_init(&cfg->grd_config);
 	CKS_init();
 //	SIM_init();
-	Serial.println(F("\nStarted"));
+	LOG("Started.");
 }
 
 

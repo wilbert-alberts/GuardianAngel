@@ -11,6 +11,7 @@
 #include "Timestamp.h"
 #include "Scheduler.h"
 #include "Timer.h"
+#include "Log.h"
 
 typedef struct {
 	ID_id id;
@@ -31,7 +32,7 @@ static void sdl_clearTask(SDL_taskStruct* task);
 static void sdl_handleTasks();
 
 void SDL_init() {
-	Serial.println(F("> SDL_init()"));
+	LOG_entry("SDL_init()");
 	for (uint8_t i = 1; i < SDL_MAX_NR_TASKS; i++) {
 		sdl_clearTask(&sdl_tasks[i]);
 	}
@@ -39,10 +40,11 @@ void SDL_init() {
 	sdl_initTime();
 	TMR_registerCB(sdl_tick, NULL, 1000);
 	sdl_ticking = true;
-	Serial.println(F("< SDL_init()"));
+	LOG_exit("SDL_init()");
 }
 
-ID_id SDL_addTask(const TS_timestamp* moment, SDL_taskFunc task, void* context) {
+ID_id SDL_addTask(const TS_timestamp* moment, SDL_taskFunc task,
+		void* context) {
 	for (uint8_t i = 0; i < SDL_MAX_NR_TASKS; i++) {
 		if (sdl_tasks[i].id == ID_NULL) {
 			sdl_tasks[i].id = ID_getNext(&sdl_taskId);
@@ -52,11 +54,11 @@ ID_id SDL_addTask(const TS_timestamp* moment, SDL_taskFunc task, void* context) 
 			return sdl_tasks[i].id;
 		}
 	}
+	LOG("SDL_addTask(): unable to add task, out of free slots.");
 	return ID_NULL;
 }
 
-void  SDL_getTime(TS_timestamp* dest)
-{
+void SDL_getTime(TS_timestamp* dest) {
 	*dest = sdl_now;
 }
 
@@ -69,21 +71,27 @@ void SDL_removeTask(ID_id task) {
 }
 
 uint8_t SDL_setTime(const TS_timestamp* now, uint8_t secs) {
-	if (TS_compare(&sdl_now, now) > 0) {
+	LOG_entry("SDL_setTime");
+
+	if (TS_compare(&sdl_now, now) < 0) {
+		LOG("SDL_setTime(): SDL is minutes behind, catch up.");
 		sdl_now = *now;
 		sdl_seconds = secs;
 		sdl_ticking = true;
-		return 0;
+	} else {
+
+		if ((TS_compare(&sdl_now, now) == 0) && (secs > sdl_seconds)) {
+			LOG("SDL_setTime(): SDL is seconds behind, catch up.");
+			sdl_seconds = secs;
+			sdl_ticking = true;
+		} else {
+
+			LOG("SDL_setTime(): SDL is ahead, stop ticking");
+			sdl_ticking = false;
+		}
 	}
 
-	if ((TS_compare(&sdl_now, now) == 0) && (secs > sdl_seconds)) {
-		sdl_seconds = secs;
-		sdl_ticking= true;
-		return 0;
-	}
-
-	Serial.println(F("= SDL_setTime: trying to go back in time, stop ticking"));
-	sdl_ticking = false;
+	LOG_exit("SDL_setTime");
 	return -1;
 }
 

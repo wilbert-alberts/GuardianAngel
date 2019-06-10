@@ -10,7 +10,7 @@
 #include <avr/pgmspace.h>
 #include <GSMSim.h>
 
-
+#include "Log.h"
 #include "Timestamp.h"
 #include "GSM.h"
 
@@ -23,21 +23,21 @@ static GSMSim gsm(RX, TX, RESET);
 
 void GSM_init()
 {
-	Serial.println(F("> GSM_init()"));
+	LOG_entry("GSM_init()");
 	gsm.start();
 
 	if (gsm.pinStatus() == 1) {
-		Serial.println(F("= GSM_init(): pin required, sending 0000"));
+		LOG("GSM_init(): pin required, sending 0000.");
 		gsm.print("AT+CPIN=\"0000\"");
-		Serial.println(F("= GSM_init(): pin required, sent 0000"));
+		LOG("GSM_init(): pin required, sent 0000.");
 	}
 
 	if (gsm.pinStatus() != 0) {
-		Serial.print(F("= GSM_init(): pin status not ok:"));
-		Serial.print(gsm.pinStatus());
+		LOG("GSM_init(): pin status not OK.");
+		LOG_nf(gsm.pinStatus());
 	}
 
-	Serial.println(F("< GSM_init()"));
+	LOG_exit("GSM_init()");
 }
 
 void GSM_getTime(TS_timestamp* ts, uint8_t* seconds)
@@ -49,7 +49,7 @@ void GSM_getTime(TS_timestamp* ts, uint8_t* seconds)
 	int minute;
 	int second;
 
-	Serial.println(F("> GSM_getTime()"));
+	LOG_entry("GSM_getTime()");
 	gsm.timeGet(&day, &month, &year, &hour, &minute, &second);
 
 	ts->day = day-1;
@@ -59,13 +59,13 @@ void GSM_getTime(TS_timestamp* ts, uint8_t* seconds)
 	ts->minute = minute;
 	*seconds = second;
 
-	Serial.println(F("= GSM_getTime(): time: "));
+	LOG("GSM_getTime(): time: ");
 	TS_print(ts);
-	Serial.print(":");
-	Serial.print(*seconds);
-	Serial.println(F("."));
+	LOG_nf(F(":"));
+	LOG_nf(*seconds);
+	LOG_nf(F(".\n"));
 
-	Serial.println(F("< GSM_getTime()"));
+	LOG_exit("GSM_getTime()");
 }
 
 void GSM_sendSMS(GSM_Number number, GSM_Message message)
