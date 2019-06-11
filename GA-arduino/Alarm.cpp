@@ -5,13 +5,19 @@
  *      Author: wilbert
  */
 
+#include "Angel.h"
+#include "Log.h"
+
+
 void ALM_init()
 {
 }
 
-void AL_raiseAlarm()
+void ALM_raiseAlarm()
 {
-
+	LOG_entry("ALM_raiseAlarm");
+	ANG_alarmAll();
+	LOG_exit("ALM_raiseAlarm");
 }
 
 

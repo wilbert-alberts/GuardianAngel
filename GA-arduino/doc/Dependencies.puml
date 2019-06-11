@@ -2,6 +2,7 @@
 
 GuardTask ..> Scheduler
 ClockSync ..> Scheduler
+GSM ..> Timer
 Scheduler ..> Timer
 Motion ..> Timer
 GuardTask ..> Alarm
@@ -10,7 +11,6 @@ ClockSync ..> GSM
 
 Alarm ..> Angel
 Angel ..> GSM
-
 
 Scheduler ..> Timestamp
 GuardTask ..> Timestamp

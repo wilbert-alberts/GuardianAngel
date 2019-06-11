@@ -31,9 +31,9 @@ static void cfg_readAll();
 
 void CFG_init()
 {
-	LOG_entry("CFG_init()");
+	LOG_entry("CFG_init");
 	cfg_readAll();
-	LOG_exit("CFG_init()");
+	LOG_exit("CFG_init");
 }
 
 bool CFG_getCfgAng(ANG_config** ang_config)
@@ -50,7 +50,7 @@ bool CFG_getCfgGrd(GRD_config** grd_config)
 
 void CFG_persist()
 {
-	LOG_entry("CFG_persist()");
+	LOG_entry("CFG_persist");
 	char* cfgPtr = (char*)&cfg_eConfig;
 	cfg_eConfig.nrPersist++;
 
@@ -58,14 +58,14 @@ void CFG_persist()
 	EEPROM.put(0, cfg_eConfig);
 	LOG("cfg_writeAll(): writing EEPROM done.");
 
-	LOG_exit("CFG_persist()");
+	LOG_exit("CFG_persist");
 }
 
 static void cfg_readAll()
 {
 	char* cfgPtr = (char*)&cfg_eConfig;
 
-	LOG_entry("cfg_readAll()");
+	LOG_entry("cfg_readAll");
 
 	LOG("cfg_readAll(): Reading EEPROM content.");
 	EEPROM.get(0, cfg_eConfig);
@@ -80,13 +80,13 @@ static void cfg_readAll()
 		if (ch != cfg_expectedMagic[a]) {
 			LOG("cfg_readAll(): Invalid header.");
 			cfg_cfgRead = false;
-			LOG_exit("cfg_readAll()");
+			LOG_exit("cfg_readAll");
 			return;
 		}
 	}
 	LOG("cfg_readAll(): config succesfully read.");
 	cfg_cfgRead = true;
-	LOG_exit("cfg_readAll()");
+	LOG_exit("cfg_readAll");
 }
 
 

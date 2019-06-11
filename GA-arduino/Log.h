@@ -11,16 +11,19 @@
 #include <Arduino.h>
 #include <Print.h>
 
-#define _log(x) Serial.println(F(x));
+#define _log(x) Serial.print(F(x));
 
 #define LOG_entry(x) Serial.print(F("> ")); \
-	                 _log(x);
+	                 _log(x); \
+					 Serial.println(F("()"));
 
 #define LOG_exit(x)  Serial.print(F("< ")); \
-	                 _log(x);
+	                 _log(x); \
+					 Serial.println(F("()"));
 
 #define LOG(x)       Serial.print(F("= ")); \
-					 _log(x)
+	                 _log(x); \
+					 Serial.println(F("()"));
 
 #define LOG_nf(x)    Serial.print(x);
 

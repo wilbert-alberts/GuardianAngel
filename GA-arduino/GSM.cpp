@@ -12,6 +12,7 @@
 
 #include "Log.h"
 #include "Timestamp.h"
+#include "Timer.h"
 #include "GSM.h"
 
 #define RX 7
@@ -20,10 +21,12 @@
 #define BAUD 9600
 
 static GSMSim gsm(RX, TX, RESET);
+static void gsm_checkSMS(void* context);
+static void gsm_receiveSMS(int nr);
 
 void GSM_init()
 {
-	LOG_entry("GSM_init()");
+	LOG_entry("GSM_init");
 	gsm.start();
 
 	if (gsm.pinStatus() == 1) {
@@ -37,7 +40,11 @@ void GSM_init()
 		LOG_nf(gsm.pinStatus());
 	}
 
-	LOG_exit("GSM_init()");
+	// Clear all SMS's
+	gsm.smsDeleteAllRead();
+	TMR_registerCB(gsm_checkSMS, NULL, 1000);
+
+	LOG_exit("GSM_init");
 }
 
 void GSM_getTime(TS_timestamp* ts, uint8_t* seconds)
@@ -49,7 +56,7 @@ void GSM_getTime(TS_timestamp* ts, uint8_t* seconds)
 	int minute;
 	int second;
 
-	LOG_entry("GSM_getTime()");
+	LOG_entry("GSM_getTime");
 	gsm.timeGet(&day, &month, &year, &hour, &minute, &second);
 
 	ts->day = day-1;
@@ -65,18 +72,59 @@ void GSM_getTime(TS_timestamp* ts, uint8_t* seconds)
 	LOG_nf(*seconds);
 	LOG_nf(F(".\n"));
 
-	LOG_exit("GSM_getTime()");
+	LOG_exit("GSM_getTime");
 }
 
 void GSM_sendSMS(GSM_Number number, GSM_Message message)
 {
-
+	LOG_entry("GSM_sendSMS");
+	LOG_nf(F("= GSM_sendSMS(), sending to: "));
+	LOG_nf(number);
+	LOG_nf(F(", message: "));
+	LOG_nf(message);
+	LOG_nf(F("\n"));;
+	gsm.smsSend(number, message);
+	LOG_exit("GSM_sendSMS");
 }
 
-void GSM_registerReceiveCB(ReceiveCB cb)
+static void GSM_registerReceiveCB(ReceiveCB cb)
 {
 
 }
 
+static void gsm_checkSMS(void* context)
+{
+	LOG_entry("gsm_checkSMS");
+	String messages = gsm.smsListUnread();
+	if (messages.startsWith("NOSMS")) {
+		LOG_nf(F("= gsm_checkSMS(), no SMSs"));
+		return;
+	}
 
+	if (messages.startsWith("SMSIndexNo:")) {
+		LOG_nf(F("= gsm_checkSMS(), found new SMSs"));
 
+		messages = messages.substring(strlen("SMSIndexNo:"));
+		while( messages.indexOf(',') > 0) {
+			String nrStr = messages.substring(0, messages.indexOf(','));
+			messages = messages.substring(messages.indexOf(','));
+			nrStr.trim();
+			int nr = nrStr.toInt();
+			gsm_receiveSMS(nr);
+		}
+		// Handle final number
+		String nrStr = messages;
+		nrStr.trim();
+		int nr = nrStr.toInt();
+		gsm_receiveSMS(nr);
+
+		return;
+	}
+
+}
+
+static void gsm_receiveSMS(int nr)
+{
+	String msg = gsm.smsRead(nr);
+
+}

@@ -32,7 +32,7 @@ static void sdl_clearTask(SDL_taskStruct* task);
 static void sdl_handleTasks();
 
 void SDL_init() {
-	LOG_entry("SDL_init()");
+	LOG_entry("SDL_init");
 	for (uint8_t i = 1; i < SDL_MAX_NR_TASKS; i++) {
 		sdl_clearTask(&sdl_tasks[i]);
 	}
@@ -40,21 +40,33 @@ void SDL_init() {
 	sdl_initTime();
 	TMR_registerCB(sdl_tick, NULL, 1000);
 	sdl_ticking = true;
-	LOG_exit("SDL_init()");
+	LOG_exit("SDL_init");
 }
 
 ID_id SDL_addTask(const TS_timestamp* moment, SDL_taskFunc task,
 		void* context) {
+	LOG_entry("SDL_addTask");
+	LOG_nf(F("= SDL_addTask(), moment: "));
+	TS_print(moment);
+	LOG_nf(F(", task: "));
+	LOG_nf((uint16_t)task);
+	LOG_nf(F("\n"));
+
 	for (uint8_t i = 0; i < SDL_MAX_NR_TASKS; i++) {
 		if (sdl_tasks[i].id == ID_NULL) {
 			sdl_tasks[i].id = ID_getNext(&sdl_taskId);
 			sdl_tasks[i].func = task;
 			sdl_tasks[i].context = context;
 			sdl_tasks[i].when = *moment;
+			LOG_nf(F("= SDL_addTask(), returned task id: "));
+			LOG_nf(sdl_tasks[i].id);
+			LOG_nf(F("\n"));
+			LOG_exit("SDL_addTask")
 			return sdl_tasks[i].id;
 		}
 	}
 	LOG("SDL_addTask(): unable to add task, out of free slots.");
+	LOG_exit("SDL_addTask");
 	return ID_NULL;
 }
 
@@ -63,11 +75,16 @@ void SDL_getTime(TS_timestamp* dest) {
 }
 
 void SDL_removeTask(ID_id task) {
+	LOG_entry("SDL_removeTask");
+	LOG_nf(F("= SDL_removeTask(), id: "));
+	LOG_nf(task);
+	LOG_nf(F("\n"));
 	for (uint8_t i = 0; i < SDL_MAX_NR_TASKS; i++) {
 		if (sdl_tasks[i].id == task) {
 			sdl_clearTask(&sdl_tasks[i]);
 		}
 	}
+	LOG_exit("SDL_removeTask");
 }
 
 uint8_t SDL_setTime(const TS_timestamp* now, uint8_t secs) {
@@ -92,7 +109,7 @@ uint8_t SDL_setTime(const TS_timestamp* now, uint8_t secs) {
 	}
 
 	LOG_exit("SDL_setTime");
-	return -1;
+	return sdl_ticking ? 0 : -1;
 }
 
 static void sdl_tick(void* context) {
@@ -102,7 +119,6 @@ static void sdl_tick(void* context) {
 			sdl_seconds = 0;
 			TS_addMinutes(&sdl_now, 1);
 			TS_print(&sdl_now);
-			Serial.println(F(""));
 			sdl_handleTasks();
 		}
 	}
@@ -118,9 +134,17 @@ static void sdl_initTime() {
 }
 
 static void sdl_handleTasks() {
+	LOG_entry("sdl_handleTasks");
+	LOG_nf(F("= sdl_handleTasks(), time: "));
+	TS_print(&sdl_now);
+	LOG_nf(F("\n"));
+
 	for (uint8_t i = 0; i < SDL_MAX_NR_TASKS; i++) {
 		if (sdl_tasks[i].id != ID_NULL) {
 			if (TS_compare(&sdl_now, &sdl_tasks[i].when) >= 0) {
+				LOG_nf(F("= sdl_handleTasks(), executing task: "));
+				LOG_nf(sdl_tasks[i].id);
+				LOG_nf(F("\n"));
 				SDL_taskFunc func = sdl_tasks[i].func;
 				void* context = sdl_tasks[i].context;
 				sdl_clearTask(&sdl_tasks[i]);
@@ -128,6 +152,7 @@ static void sdl_handleTasks() {
 			}
 		}
 	}
+	LOG_exit("sdl_handleTasks");
 }
 
 static void sdl_clearTask(SDL_taskStruct* task) {

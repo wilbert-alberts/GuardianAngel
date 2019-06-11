@@ -11,6 +11,6 @@
 #include "Angel_cfg.h"
 
 void ANG_init();
-
+void ANG_alarmAll();
 
 #endif /* ANGEL_H_ */

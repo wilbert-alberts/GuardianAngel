@@ -46,7 +46,7 @@ static void mtn_clearListener(mtn_ListenerStruct* listener);
 
 void MTN_init()
 {
-	LOG_entry("MTN_init()");
+	LOG_entry("MTN_init");
 	// Initialize listener administration;
 	for (int i=0; i< MTN_MAX_LISTENERS; i++) {
 		mtn_clearListener(&mtn_listeners[i]);
@@ -59,7 +59,7 @@ void MTN_init()
 
 	// Register motion_tick with 10ms period
 	TMR_registerCB(mtn_tick, NULL, 10);
-	LOG_entry("MTN_exit()");
+	LOG_entry("MTN_exit");
 }
 
 ID_id MTN_addListener(MTN_Func listener, void* context)

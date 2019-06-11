@@ -13,7 +13,7 @@
 #include "Angel.h"
 #include "Log.h"
 
-static void Callback(void*);
+static void CreateGuardTasks(void);
 
 void setup(void)
 {
@@ -36,13 +36,41 @@ void setup(void)
 	GRD_init();
 	CKS_init();
 //	SIM_init();
+
+	CreateGuardTasks();
 	LOG("Started.");
 }
 
 
-void Callback(void*)
+void CreateGuardTasks(void)
 {
-	Serial.println(F("1 Second."));
+	LOG_entry("CreateGuardTasks");
+	static GRD_TaskCfgStruct tskMorning;
+	static GRD_TaskCfgStruct tskEvening;
+	static GRD_TaskCfgStruct tskAllDay;
+
+	tskMorning.start.hour  = 6;
+	tskMorning.start.minute= 0;
+	tskMorning.stop.hour  = 11;
+	tskMorning.stop.minute= 30;
+	tskMorning.minMotion = 1;
+
+	tskEvening.start.hour  = 20;
+	tskEvening.start.minute= 0;
+	tskEvening.stop.hour  = 1;
+	tskEvening.stop.minute= 0;
+	tskEvening.minMotion = 1;
+
+	tskAllDay.start.hour  = 7;
+	tskAllDay.start.minute= 0;
+	tskAllDay.stop.hour  = 1;
+	tskAllDay.stop.minute= 0;
+	tskAllDay.minMotion = 2;
+
+	GRD_createTask(&tskMorning);
+	GRD_createTask(&tskEvening);
+	GRD_createTask(&tskAllDay);
+	LOG_exit("CreateGuardTasks");
 }
 
 void loop(void)
