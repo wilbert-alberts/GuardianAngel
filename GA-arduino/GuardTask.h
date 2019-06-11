@@ -8,21 +8,7 @@
 #ifndef GUARDTASK_H_
 #define GUARDTASK_H_
 
-#include "Timestamp.h"
-
-#define GRD_MAX_TASKS (5)
-
-typedef struct
-{
-	TS_HHmm start;
-	TS_HHmm stop;
-	uint8_t minMotion;
-} GRD_TaskCfgStruct;
-
-typedef struct
-{
-	GRD_TaskCfgStruct tasks[GRD_MAX_TASKS];
-} GRD_config;
+#include "GuardTask_cfg.h"
 
 void GRD_init();
 void GRD_createTask(GRD_TaskCfgStruct* taskCfg);

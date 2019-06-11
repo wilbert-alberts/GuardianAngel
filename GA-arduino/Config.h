@@ -8,8 +8,8 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-#include "Angel.h"
-#include "GuardTask.h"
+#include "Angel_cfg.h"
+#include "GuardTask_cfg.h"
 
 #define CFG_VERSION (1)
 

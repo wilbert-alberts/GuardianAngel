@@ -10,6 +10,7 @@
 #include "GSM.h"
 #include "Alarm.h"
 #include "ClockSync.h"
+#include "Angel.h"
 #include "Log.h"
 
 static void Callback(void*);
