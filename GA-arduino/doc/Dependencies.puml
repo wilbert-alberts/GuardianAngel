@@ -21,3 +21,26 @@ Angel ..> CFG
 GuardTask ..> CFG
 
 @enduml
+
+Integration:
+- Ensure correctness of Timer and Timestamp
+- Integrate CFG (ANG and GRD not integrated so no real data read)
+- Integrate GSM
+- Integrate Scheduler
+- Integrate ANG 
+	- initialization
+	  (will require ability to read and store data from EEPROM)
+	- incoming SMS to add angel. 
+- Integrate Motion
+	- increase 'dead time' and test whether motion is only
+	  leading to notifications while being idle
+- Don't integrate Alarm as it is still a pass through to Angel
+- Integrate GuardTask
+	- disconnect motion from guard task
+		- test start and stopping of task
+	- connect motion to task 
+		- test that motion is ignored outside active window
+		- test that motion is counted (setting high threshold)
+		- test that motion leads to triggering ALARM
+- Integrate ClockSync
+- Integrate SimMgr (to be written)

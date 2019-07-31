@@ -91,9 +91,11 @@ static void mtn_tick(void* context)
 	uint8_t motion = mtn_detectMotion();
 	switch (mtn_detector.state) {
 	case MTN_STATE_IDLE:
+		LOG_nf(F("motion detected while idle"));
 		mtn_tickWhileIdle(motion);
 		break;
 	case MTN_STATE_FIRED:
+		LOG_nf(F("motion detected while cooling off"));
 		mtn_tickWhileFired(motion);
 		break;
 	default:
