@@ -1,3 +1,6 @@
+#ifndef __MAIN__
+#define __MAIN__
+
 #include <Arduino.h>
 
 #include <Print.h>
@@ -79,3 +82,4 @@ void loop(void)
 }
 
 
+#endif
