@@ -21,23 +21,24 @@ void setup(void)
 
 	Serial.begin(115200);
 	LOG("Starting.");
+//  CFG_clear();
 	CFG_init();
 
+  TMR_init();
 	GSM_init();
 
-	TMR_init();
-	ANG_init();
+//	ANG_init();
 
-	MTN_init();
-	SDL_init();
-	ALM_init();
+//	MTN_init();
+//	SDL_init();
+//	ALM_init();
 
 
-	GRD_init();
-	CKS_init();
+//	GRD_init();
+//	CKS_init();
 //	SIM_init();
 
-	CreateGuardTasks();
+//	CreateGuardTasks();
 	LOG("Started.");
 }
 
@@ -77,5 +78,3 @@ void loop(void)
 {
 	delay(15000);
 }
-
-

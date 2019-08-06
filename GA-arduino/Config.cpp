@@ -36,6 +36,15 @@ void CFG_init()
 	LOG_exit("CFG_init");
 }
 
+void CFG_clear()
+{
+  LOG_entry("CFG_clear");
+  for (int i = 0 ; i < EEPROM.length() ; i++) {
+    EEPROM.write(i, 0);
+  }  
+  LOG_exit("CFG_clear");
+}
+
 bool CFG_getCfgAng(ANG_config** ang_config)
 {
 	*ang_config = &cfg_eConfig.config.ang_config;
@@ -88,5 +97,3 @@ static void cfg_readAll()
 	cfg_cfgRead = true;
 	LOG_exit("cfg_readAll");
 }
-
-

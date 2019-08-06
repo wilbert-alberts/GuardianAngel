@@ -42,16 +42,25 @@ void TMR_init() {
 }
 
 ID_id TMR_registerCB(TMR_cb cb, void* context, uint16_t period) {
+  LOG_entry("TMR_registerCB");
+  LOG_noCR("period: ");
+  LOG_nf(period);
+  LOG_nf("\n");
 	for (uint8_t i = 0; i < TMR_MAX_NR_CALLBACKS; i++) {
 		if (tmr_callbacks[i].id == ID_NULL) {
 			tmr_callbacks[i].id = ID_getNext(&tmr_callbackID);
 			tmr_callbacks[i].cb = cb;
 			tmr_callbacks[i].context = context;
 			tmr_callbacks[i].period = period;
+      LOG_noCR("id: ");
+      LOG_nf(tmr_callbacks[i].id);
+      LOG_nf("\n");
+      LOG_exit("TMR_registerCB");
 			return tmr_callbacks[i].id;
 		}
 	}
 	LOG("TMR_registerCB(): unable to register cb, out of free slots.");
+  LOG_exit("TMR_registerCB");
 	return ID_NULL;
 }
 

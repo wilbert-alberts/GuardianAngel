@@ -21,6 +21,7 @@ typedef struct
 
 
 void CFG_init();
+void CFG_clear();
 void CFG_persist();
 bool CFG_getCfgAng(ANG_config** ang_config);
 bool CFG_getCfgGrd(GRD_config** grd_config);
