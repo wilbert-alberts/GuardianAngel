@@ -36,6 +36,7 @@ static ID_id sdl_subscriberId;
 
 void GSM_init() {
 	LOG_entry("GSM_init");
+  /*
 	gsm.start();
 
 	for (uint8_t i = 1; i < GSM_MAX_SMS_SUBSCRIBERS; i++) {
@@ -49,12 +50,14 @@ void GSM_init() {
 	}
 
 	if (gsm.pinStatus() != 0) {
-		LOG("GSM_init(): pin status not OK.");
+		LOG_noCR("GSM_init(): pin status not OK: ");
 		LOG_nf(gsm.pinStatus());
+    LOG_nf("\n");
 	}
 
 	// Clear all SMS's
 	gsm.smsDeleteAllRead();
+ */
 	TMR_registerCB(gsm_checkSMS, NULL, 1000);
 
 	LOG_exit("GSM_init");

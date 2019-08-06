@@ -21,9 +21,12 @@
 	                 _log(x); \
 					 Serial.println(F("()"));
 
-#define LOG(x)       Serial.print(F("= ")); \
-	                 _log(x); \
-					 Serial.println(F("()"));
+#define LOG(x)      Serial.print(F("= ")); \
+	                  _log(x); \
+					          Serial.println();
+
+#define LOG_noCR(x)      Serial.print(F("= ")); \
+                    _log(x);
 
 #define LOG_nf(x)    Serial.print(x);
 
