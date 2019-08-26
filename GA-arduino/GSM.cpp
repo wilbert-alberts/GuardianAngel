@@ -15,29 +15,31 @@
 #include "GSM.h"
 #include "ID.h"
 
-
-#define RX 7
-#define TX 8
-#define RESET 2
+#define RX 3
+#define TX 2
+#define RESET 7
 #define BAUD 9600
 
 typedef struct {
 	ID_id id;
 	ReceiveCB cb;
-} GSM_smsSubscriber ;
+} GSM_smsSubscriber;
 
 static GSMSim gsm(RX, TX, RESET);
 static void gsm_checkSMS(void *context);
 static void gsm_receiveSMS(int nr);
-static void gsm_clearSubscriber(GSM_smsSubscriber* sub);
+static void gsm_clearSubscriber(GSM_smsSubscriber *sub);
 
 static GSM_smsSubscriber gsm_smsSubscriber[GSM_MAX_SMS_SUBSCRIBERS];
 static ID_id sdl_subscriberId;
 
 void GSM_init() {
 	LOG_entry("GSM_init");
-  /*
+
 	gsm.start();
+	gsm.reset();
+	gsm.smsTextMode(true);
+	// Maybe send AT+CMEE=[2]
 
 	for (uint8_t i = 1; i < GSM_MAX_SMS_SUBSCRIBERS; i++) {
 		gsm_clearSubscriber(&gsm_smsSubscriber[i]);
@@ -45,20 +47,19 @@ void GSM_init() {
 
 	if (gsm.pinStatus() == 1) {
 		LOG("GSM_init(): pin required, sending 0000.");
-		gsm.print("AT+CPIN=\"0000\"");
+		gsm.print("AT+CPIN=\"0000\"\r");
 		LOG("GSM_init(): pin required, sent 0000.");
 	}
 
 	if (gsm.pinStatus() != 0) {
 		LOG_noCR("GSM_init(): pin status not OK: ");
 		LOG_nf(gsm.pinStatus());
-    LOG_nf("\n");
+		LOG_nf("\n");
 	}
 
 	// Clear all SMS's
-	gsm.smsDeleteAllRead();
- */
-	TMR_registerCB(gsm_checkSMS, NULL, 1000);
+	gsm.smsDeleteAll();
+ 	TMR_registerCB(gsm_checkSMS, NULL, 10000);
 
 	LOG_exit("GSM_init");
 }
@@ -123,10 +124,15 @@ ID_id GSM_registerReceiveCB(ReceiveCB cb) {
 static void gsm_checkSMS(void *context) {
 	LOG_entry("gsm_checkSMS");
 	String messages = gsm.smsListUnread();
+	Serial.println("msg: ===");
+	Serial.println(messages);
+	Serial.println("===");
 	if (messages.startsWith("NOSMS")) {
 		LOG_nf(F("= gsm_checkSMS(), no SMSs"));
+		LOG_exit("gsm_checkSMS");
 		return;
 	}
+	LOG_nf(F("= gsm_checkSMS(), SMS received"));
 
 	if (messages.startsWith("SMSIndexNo:")) {
 		LOG_nf(F("= gsm_checkSMS(), found new SMSs"));
@@ -145,17 +151,28 @@ static void gsm_checkSMS(void *context) {
 		int nr = nrStr.toInt();
 		gsm_receiveSMS(nr);
 
-		return;
 	}
 
+	LOG_exit("gsm_checkSMS");
 }
 
 static void gsm_receiveSMS(int nr) {
+	LOG_entry("gsm_receiveSMS");
+	LOG("nr: ");
+	LOG_nf(nr);
 	String msg = gsm.smsRead(nr);
-
+	LOG("msg: ")
+	LOG_nf(msg);
+	LOG("\n");
+	for (uint8_t i=0; i<GSM_MAX_SMS_SUBSCRIBERS; i++) {
+		if (gsm_smsSubscriber[i].id != ID_NULL) {
+			gsm_smsSubscriber[i].cb(nr, msg.c_str());
+		}
+	}
+	LOG_exit("gsm_receiveSMS");
 }
 
-static void gsm_clearSubscriber(GSM_smsSubscriber* sub) {
+static void gsm_clearSubscriber(GSM_smsSubscriber *sub) {
 	sub->id = ID_NULL;
 	sub->cb = NULL;
 }

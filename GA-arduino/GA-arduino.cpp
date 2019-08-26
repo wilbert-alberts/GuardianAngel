@@ -1,6 +1,3 @@
-#ifndef __MAIN__
-#define __MAIN__
-
 #include <Arduino.h>
 
 #include <Print.h>
@@ -27,7 +24,7 @@ void setup(void)
 //  CFG_clear();
 	CFG_init();
 
-  TMR_init();
+	TMR_init();
 	GSM_init();
 
 //	ANG_init();
@@ -79,5 +76,5 @@ void CreateGuardTasks(void)
 
 void loop(void)
 {
-	delay(15000);
+	TMR_checkPendingCBs();
 }
