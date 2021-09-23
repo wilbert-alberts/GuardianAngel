@@ -7,14 +7,16 @@
 
 
 #ifndef CLOCK_HPP_
-#define  CLOCK_HPP_
+#define CLOCK_HPP_
+
+#include <memory>
 
 #include "Time24.hpp"
 
 class Clock {
 public:
     virtual ~Clock() {};
-    virtual Time24& getTime() const = 0;
+    virtual std::shared_ptr<Time24> getTime() const = 0;
 };
 
 #endif

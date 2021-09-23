@@ -8,11 +8,13 @@
 #ifndef TIME24FACTORY_HPP_
 #define TIME24FACTORY_HPP_
 
+#include<memory>
+
 class Time24;
 
 namespace Time24Factory {
 
-extern Time24* create(int h, int m, int s = 0);
+extern std::shared_ptr<Time24> create(int h, int m, int s = 0);
 
 }
 #endif /* TIME24FACTORY_HPP_ */
