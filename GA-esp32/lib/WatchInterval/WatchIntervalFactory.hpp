@@ -3,7 +3,7 @@
 
 class WatchInterval;
 
-namespace WatchIntervalFactory {}
+namespace WatchIntervalFactory {
 
 WatchInterval* create();
 

@@ -12,7 +12,7 @@
 #include "Clock.hpp"
 
 namespace ClockFactory {
-    Clock* create();
+    std::shared_ptr<Clock> create();
 }
 
 #endif

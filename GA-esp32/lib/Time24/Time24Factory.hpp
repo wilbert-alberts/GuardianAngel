@@ -14,7 +14,7 @@ class Time24;
 
 namespace Time24Factory {
 
-extern std::shared_ptr<Time24> create(int h, int m, int s = 0);
+std::shared_ptr<Time24> create(int h, int m, int s);
 
 }
 #endif /* TIME24FACTORY_HPP_ */

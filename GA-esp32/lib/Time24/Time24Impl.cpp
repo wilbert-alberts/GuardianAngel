@@ -14,7 +14,7 @@
 
 class Time24Impl: public Time24 {
 public:
-	Time24Impl(int h, int m, int s = 0);
+	Time24Impl(int h, int m, int s);
 	virtual ~Time24Impl();
 
 	virtual int getHours() const;
@@ -43,8 +43,8 @@ private:
 };
 
 namespace Time24Factory {
-extern Time24* create(int h, int m, int s=0) {
-	return new Time24Impl(h, m, s);
+	std::shared_ptr<Time24> create(int h, int m, int s) {
+	return std::shared_ptr<Time24>(new Time24Impl(h, m, s));
 }
 }
 

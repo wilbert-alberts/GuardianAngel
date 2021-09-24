@@ -8,8 +8,8 @@
 #include "WatchDog.hpp"
 #include "WatchDogFactory.hpp"
 
-#include "WatchInterval.hpp"
-#include "Clock.hpp"
+#include "WatchInterval/WatchInterval.hpp"
+#include "Clock/Clock.hpp"
 
 #include <set>
 #include <algorithm>
@@ -18,7 +18,7 @@
 class WatchDogImpl : public WatchDog
 {
 public:
-    WatchDogImpl();
+    WatchDogImpl() {};
     virtual ~WatchDogImpl() {}
     virtual void addInterval(const WatchInterval &i);
     virtual void delInterval(const WatchInterval &i);
@@ -26,11 +26,11 @@ public:
 private:
     void processIntervals();
 
-    const Clock& clock;
-    const ActivityDetector&  activityDetector;
+    const Clock * clock;
+//    const ActivityDetector&  activityDetector;
 
-    std::set<WatchInterval &> intervals;
-}
+//    std::set<const WatchInterval &> intervals;
+};
 
 WatchDog* WatchDogFactory::create() {
     return new WatchDogImpl();
@@ -40,21 +40,21 @@ WatchDog* WatchDogFactory::create() {
 
 void WatchDogImpl::addInterval(const WatchInterval &i)
 {
-    intervals.insert(i);
+//    intervals.insert(i);
 }
 
-void WatchDogImpl::delInterval(ocnst WatchInterval &i)
+void WatchDogImpl::delInterval(const  WatchInterval &i)
 {
-    intervals.erase(i);
+//    intervals.erase(i);
 }
 
 void WatchDogImpl::processIntervals() {
-    const Time24& now = clock.getTime();
-    bool activity = activityDetector.isActivityDetected();
+//    auto now = clock->getTime();
+//    bool activity = activityDetector.isActivityDetected();
 
-    for (auto iter = intervals.begin(); iter != intervals.end(); iter++) {
-        iter->processInterval(now, activity);
-    }
+//    for (auto iter = intervals.begin(); iter != intervals.end(); iter++) {
+//        iter->processInterval(now, activity);
+//    }
 } 
 
 

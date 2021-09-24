@@ -5,22 +5,43 @@
  *      Author: wilbert
  */
 
-
-#include <Arduino.h>
+#include "platform.hpp"
 
 #include <iostream>
 
-#include "ClockFactory.hpp"
+#include "Clock/ClockFactory.hpp"
+
+#ifdef GA_POSIX
+
+#include <unistd.h>
+
+int main() {
+	std::cout << "Starting." << std::endl;
+
+	auto clock = ClockFactory::create();
+	std::cout << "Started." << std::endl;
+
+	sleep(10);
+
+	std::cout << "Stopping." << std::endl;
+	clock->terminate();
+	std::cout << "Stopped." << std::endl;
+
+	return 0;
+}
+
+#else
 
 void setup() {
+
 	Serial.begin(115200);
 	Serial.println("Started");
-	
-	auto clock = ClockFactory::create();
 
-	// auto pt = new PeriodicTask("main", 1000);
+    auto pt = new PeriodicTask("main", 1000);
 
 }
 
 void loop() {
 }
+
+#endif

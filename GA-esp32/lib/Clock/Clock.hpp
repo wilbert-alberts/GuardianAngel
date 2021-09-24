@@ -11,11 +11,12 @@
 
 #include <memory>
 
-#include "Time24.hpp"
+#include "Time24/Time24.hpp"
 
 class Clock {
 public:
     virtual ~Clock() {};
+    virtual void terminate() = 0;
     virtual std::shared_ptr<Time24> getTime() const = 0;
 };
 

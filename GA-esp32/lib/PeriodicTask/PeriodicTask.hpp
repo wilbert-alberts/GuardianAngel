@@ -2,7 +2,7 @@
 #ifndef PERIODICTASK_HPP_
 #define PERIODICTASK_HPP_
 
-#include "ActiveTask.hpp"
+#include "ActiveTask/ActiveTask.hpp"
 
 class PeriodicTask : public ActiveTask
 {
@@ -11,11 +11,13 @@ public:
     virtual ~PeriodicTask()
     {
     }
+    virtual void terminate();
     virtual void tick() {}
     virtual void task();
 
 private:
     int period;
+    bool terminateRequested;
 };
 
 #endif
