@@ -8,8 +8,8 @@
 #ifndef WATCHDOG_HPP_
 #define WATCHDOG_HPP_
 
-#include "Clock/Clock.hpp"
-#include "WatchInterval/WatchInterval.hpp"
+#include "Clock.hpp"
+#include "WatchInterval.hpp"
 
 class WatchDog {
 public:

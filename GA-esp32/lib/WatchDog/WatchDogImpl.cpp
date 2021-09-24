@@ -8,8 +8,8 @@
 #include "WatchDog.hpp"
 #include "WatchDogFactory.hpp"
 
-#include "WatchInterval/WatchInterval.hpp"
-#include "Clock/Clock.hpp"
+#include "WatchInterval.hpp"
+#include "Clock.hpp"
 
 #include <set>
 #include <algorithm>

@@ -7,15 +7,10 @@ PeriodicTask::PeriodicTask(const char *taskName, int periodInMs, int stackSize) 
 {
 }
 
-void PeriodicTask::terminate()
-{
-	terminateRequested = true;
-}
-
 void PeriodicTask::task()
 {
 #ifdef GA_POSIX
-	while (!terminateRequested)
+	while (1)
 	{
 		tick();
 		usleep(1000 * period);

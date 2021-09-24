@@ -5,7 +5,7 @@
  *      Author: wilbert
  */
 
-#include "Time24/Time24.hpp"
+#include "Time24.hpp"
 #include "Time24Interval.hpp"
 #include "Time24IntervalFactory.hpp"
 

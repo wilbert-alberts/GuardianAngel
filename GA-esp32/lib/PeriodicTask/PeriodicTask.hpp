@@ -11,7 +11,6 @@ public:
     virtual ~PeriodicTask()
     {
     }
-    virtual void terminate();
     virtual void tick() {}
     virtual void task();
 

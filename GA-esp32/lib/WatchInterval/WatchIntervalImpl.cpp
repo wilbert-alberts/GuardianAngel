@@ -1,9 +1,9 @@
 
 #include "WatchInterval.hpp"
 
-#include "Time24/Time24.hpp"
-#include "WatchInterval/WatchInterval.hpp"
-#include "WatchInterval/WatchIntervalFactory.hpp"
+#include "Time24.hpp"
+#include "WatchInterval.hpp"
+#include "WatchIntervalFactory.hpp"
 
 
 class WatchIntervalImpl : public WatchInterval {

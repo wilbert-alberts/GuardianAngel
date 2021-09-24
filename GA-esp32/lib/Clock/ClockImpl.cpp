@@ -19,7 +19,6 @@ class ClockImpl: public Clock, public PeriodicTask {
 public:
 	ClockImpl();
 	virtual ~ClockImpl();
-	virtual void terminate();
 	virtual void tick();
 	virtual std::shared_ptr<Time24> getTime() const;
 private:
@@ -33,9 +32,6 @@ ClockImpl::ClockImpl() :
 ClockImpl::~ClockImpl() {
 }
 
-void ClockImpl::terminate() {
-	PeriodicTask::terminate();
-}
 void ClockImpl::tick() {
 #ifdef GA_POSIX
 	std::cout << "Tick ";

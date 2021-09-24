@@ -19,8 +19,8 @@ private:
     pthread_t thread;
     static void* _task(void *obj);
 #else
-    static void _task(void *obj);
     TaskHandle_t taskHandle;
+    static void _task(void *obj);
 #endif
 };
 

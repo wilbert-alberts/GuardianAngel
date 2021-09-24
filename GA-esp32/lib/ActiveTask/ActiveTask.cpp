@@ -36,7 +36,6 @@ void *ActiveTask::_task(void *p)
 void ActiveTask::_task(void *p)
 #endif
 {
-    Serial.println("ActivateTask::_task()");
     auto obj = static_cast<ActiveTask *>(p);
 
     obj->task();

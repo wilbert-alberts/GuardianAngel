@@ -16,7 +16,6 @@
 class Clock {
 public:
     virtual ~Clock() {};
-    virtual void terminate() = 0;
     virtual std::shared_ptr<Time24> getTime() const = 0;
 };
 
