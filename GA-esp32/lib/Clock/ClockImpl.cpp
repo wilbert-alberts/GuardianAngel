@@ -10,10 +10,10 @@
 #include "Clock.hpp"
 #include "ClockFactory.hpp"
 
-#include "ActiveTask/ActiveTask.hpp"
-#include "PeriodicTask/PeriodicTask.hpp"
+#include "ActiveTask.hpp"
+#include "PeriodicTask.hpp"
 
-#include "Time24/Time24Factory.hpp"
+#include "Time24Factory.hpp"
 
 class ClockImpl: public Clock, public PeriodicTask {
 public:
@@ -27,7 +27,7 @@ private:
 };
 
 ClockImpl::ClockImpl() :
-		PeriodicTask("Clock", 1000), now(Time24Factory::create(20, 0, 55)) {
+		PeriodicTask("Clock", 1000,4000), now(Time24Factory::create(20, 0, 55)) {
 }
 
 ClockImpl::~ClockImpl() {
@@ -37,12 +37,17 @@ void ClockImpl::terminate() {
 	PeriodicTask::terminate();
 }
 void ClockImpl::tick() {
+#ifdef GA_POSIX
 	std::cout << "Tick ";
 	now->addSeconds(1);
 	std::string n(now->toString());
 	std::cout << n << std::endl;
-	//    Serial.println("tick");
-	// Serial.println(n.c_str());
+#else
+	Serial.print("Tick ");
+	now->addSeconds(1);
+	std::string n(now->toString());
+	Serial.println(n.c_str());
+#endif
 }
 
 std::shared_ptr<Time24> ClockImpl::getTime() const {

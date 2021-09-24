@@ -5,17 +5,18 @@
  *      Author: wilbert
  */
 
-#include "platform.hpp"
+#include <platform.hpp>
 
 #include <iostream>
 
-#include "Clock/ClockFactory.hpp"
+#include <ClockFactory.hpp>
 
 #ifdef GA_POSIX
 
 #include <unistd.h>
 
-int main() {
+int main()
+{
 	std::cout << "Starting." << std::endl;
 
 	auto clock = ClockFactory::create();
@@ -24,7 +25,7 @@ int main() {
 	sleep(10);
 
 	std::cout << "Stopping." << std::endl;
-	clock->terminate();
+	delete (clock);
 	std::cout << "Stopped." << std::endl;
 
 	return 0;
@@ -32,16 +33,23 @@ int main() {
 
 #else
 
-void setup() {
-
+void setup()
+{
 	Serial.begin(115200);
-	Serial.println("Started");
+	Serial.println("Starting.");
 
-    auto pt = new PeriodicTask("main", 1000);
+	auto clock = ClockFactory::create();
+	Serial.println("Started.");
 
+	vTaskDelay(10 * 1000);
+
+	Serial.println("Stopping.");
+	Serial.println("Stopped.");
+	
 }
 
-void loop() {
+void loop()
+{
 }
 
 #endif

@@ -15,11 +15,11 @@ protected:
     virtual void task() = 0;
 
 private:
-    static void* _task(void *obj);
-
 #ifdef GA_POSIX
     pthread_t thread;
+    static void* _task(void *obj);
 #else
+    static void _task(void *obj);
     TaskHandle_t taskHandle;
 #endif
 };

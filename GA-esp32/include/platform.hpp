@@ -11,7 +11,7 @@
 
 // 'undefine' GA_POSIX for AVR ESP32 platform.
 
-#define GA_POSIX
+// #define GA_POSIX
 
 
 #ifdef GA_POSIX

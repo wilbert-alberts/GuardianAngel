@@ -2,7 +2,7 @@
 #ifndef PERIODICTASK_HPP_
 #define PERIODICTASK_HPP_
 
-#include "ActiveTask/ActiveTask.hpp"
+#include "ActiveTask.hpp"
 
 class PeriodicTask : public ActiveTask
 {

@@ -2,44 +2,46 @@
 
 #include "ActiveTask.hpp"
 
-ActiveTask::ActiveTask(const char *taskName, int stackSize) {
+ActiveTask::ActiveTask(const char *taskName, int stackSize)
+{
 #ifdef GA_POSIX
 
-	pthread_create(&thread, NULL, ActiveTask::_task, this);
+    pthread_create(&thread, NULL, ActiveTask::_task, this);
 
 #else
-
-        xTaskCreate(
-            ActiveTask::_task,
-            taskName,
-            stackSize,
-            this,
-            1,
-            &taskHandle);
+    Serial.println("> ActiveTask::ActiveTask()");
+    xTaskCreate(
+        ActiveTask::_task,
+        taskName,
+        stackSize,
+        this,
+        1,
+        &taskHandle);
 
 #endif
 }
 
-ActiveTask::~ActiveTask() {
+ActiveTask::~ActiveTask()
+{
 #ifdef GA_POSIX
-	pthread_kill(thread, SIGTERM);
+    pthread_kill(thread, SIGTERM);
 #else
-	vTaskDelete(taskHandle);
+    vTaskDelete(taskHandle);
 #endif
 }
 
-#include "ActiveTask.hpp"
 #ifdef GA_POSIX
-void* ActiveTask::_task(void *p)
+void *ActiveTask::_task(void *p)
 #else
 void ActiveTask::_task(void *p)
 #endif
-		{
-	auto obj = static_cast<ActiveTask*>(p);
+{
+    Serial.println("ActivateTask::_task()");
+    auto obj = static_cast<ActiveTask *>(p);
 
-	obj->task();
+    obj->task();
 
 #ifdef GA_POSIX
-	return nullptr;
+    return nullptr;
 #endif
 }
