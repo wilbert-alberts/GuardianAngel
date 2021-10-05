@@ -11,7 +11,7 @@
 
 #include <memory>
 
-#include "Time24.hpp"
+class Time24;
 
 class Clock {
 public:

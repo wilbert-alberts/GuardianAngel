@@ -7,11 +7,10 @@ class Angel
 {
 public:
     virtual ~Angel() {};
-    virtual std::string getPhoneNumber() = 0;
 
-
-    std::string name;
-    std::vector<WatchInterval> watchIntervals;
+    virtual const std::string& getPhoneNr() const = 0;
+    virtual void addInterval(const std::string& start, const std::string& end) = 0;
+    virtual void delInterval(const std::string& start, const std::string& end) = 0;
 };
 
 #endif

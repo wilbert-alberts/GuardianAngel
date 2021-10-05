@@ -7,6 +7,8 @@
 
 #include <memory>
 
+#include "platform.hpp"
+
 #include "Clock.hpp"
 #include "ClockFactory.hpp"
 
@@ -14,6 +16,7 @@
 #include "PeriodicTask.hpp"
 
 #include "Time24Factory.hpp"
+#include "Time24.hpp"
 
 class ClockImpl: public Clock, public PeriodicTask {
 public:

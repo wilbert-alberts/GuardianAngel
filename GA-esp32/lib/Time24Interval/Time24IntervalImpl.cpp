@@ -16,6 +16,8 @@ public:
 	}
 
 	virtual bool insideInterval(const Time24 &now);
+	virtual bool startsAt(const Time24 &t);
+	virtual bool endsAt(const Time24 &t);
 
 private:
 	const Time24 &start;
@@ -25,8 +27,10 @@ private:
 	bool insideEndAndStart(const Time24 &now);
 };
 
-Time24Interval* Time24IntervalFactory::create(const Time24& start, const Time24& end) {
-	return new Time24IntervalImpl(start, end);
+namespace Time24IntervalFactory {
+std::shared_ptr<Time24Interval> create(const Time24 &start, const Time24 &end) {
+	return std::shared_ptr<Time24Interval>(new Time24IntervalImpl(start, end));
+}
 }
 
 Time24IntervalImpl::Time24IntervalImpl(const Time24 &start, const Time24 &end) :
@@ -52,3 +56,12 @@ bool Time24IntervalImpl::insideEndAndStart(const Time24 &now) {
 	else
 		return false;
 }
+
+bool Time24IntervalImpl::startsAt(const Time24 &t) {
+	return start.compareTo(t) == 0;
+}
+
+bool Time24IntervalImpl::endsAt(const Time24 &t) {
+	return end.compareTo(t) == 0;
+}
+

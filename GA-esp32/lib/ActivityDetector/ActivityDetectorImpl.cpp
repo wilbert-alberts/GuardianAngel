@@ -6,6 +6,9 @@
  */
 
 #include <memory>
+#include <vector>
+#include <algorithm>
+
 #include "ActivityDetector.hpp"
 #include "ActivityDetectorFactory.hpp"
 #include "Debouncer.hpp"
@@ -17,7 +20,8 @@ public:
 	virtual ~ActivityDetectorImpl() {
 	}
 	virtual void tick();
-	virtual void setListener(std::shared_ptr<ActivityListener> listener);
+	virtual void addListener(std::shared_ptr<ActivityListener> listener);
+	virtual void delListener(std::shared_ptr<ActivityListener> listener);
 
 private:
 	// Handle detected
@@ -26,14 +30,14 @@ private:
 	Debouncer activityDebouncer;
 //	ValueProvider valueProvider;
 
-	std::shared_ptr<ActivityListener> listener;
+	std::vector<std::shared_ptr<ActivityListener>> listeners;
 };
 
 ActivityDetectorImpl::ActivityDetectorImpl(ValueProvider vp) :
 		PeriodicTask("ActivityDetector", 50, 4000), activityDebouncer(5,
 				[=]() -> int {
 					return vp();
-				}) ,listener(nullptr) {
+				}) {
 
 }
 
@@ -52,12 +56,25 @@ void ActivityDetectorImpl::tick() {
 }
 
 void ActivityDetectorImpl::activityDetected() {
-	if (listener != nullptr)
-		listener->activityDetected();
+	std::for_each(listeners.begin(), listeners.end(), [](std::shared_ptr<ActivityListener> l){
+		l->activityDetected();
+	});
 }
 
-void ActivityDetectorImpl::setListener(std::shared_ptr<ActivityListener> l) {
-	l = listener;
+void ActivityDetectorImpl::addListener(std::shared_ptr<ActivityListener> l) {
+	if (l.get() != nullptr) {
+		if (std::find(listeners.begin(), listeners.end(), l) == listeners.end()) {
+			listeners.push_back(l);
+		}
+	}
+}
+
+void ActivityDetectorImpl::delListener(std::shared_ptr<ActivityListener> l) {
+	auto newEnd = std::remove_if(listeners.begin(), listeners.end(),
+			[&](std::shared_ptr<ActivityListener> o){
+		return o == l;
+	});
+	listeners.erase(newEnd, listeners.end());
 }
 
 namespace ActivityDetectorFactory {

@@ -8,7 +8,7 @@
 #ifndef TIME24FACTORY_HPP_
 #define TIME24FACTORY_HPP_
 
-#include<memory>
+#include <memory>
 
 class Time24;
 

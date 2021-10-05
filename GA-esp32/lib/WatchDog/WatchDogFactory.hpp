@@ -8,11 +8,14 @@
 #ifndef WATCHDOGFACTORY_HPP_
 #define WATCHDOGFACTORY_HPP_
 
-#include "WatchDog.hpp"
+#include <memory>
+
+class WatchDog;
 
 namespace WatchDogFactory
 {
-    WatchDog* create();
+    std::shared_ptr<WatchDog> create();
+
 } // namespace WatchDogFactory
 
 #endif /* WATCHDOGFACTORY_HPP_ */

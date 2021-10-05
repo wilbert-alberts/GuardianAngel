@@ -9,6 +9,8 @@
 #define LIB_ACTIVITYDETECTOR_ACTIVITYDETECTORFACTORY_HPP_
 
 #include <memory>
+
+#include "ValueProvider.hpp"
 #include "ActivityDetector.hpp"
 
 namespace ActivityDetectorFactory {

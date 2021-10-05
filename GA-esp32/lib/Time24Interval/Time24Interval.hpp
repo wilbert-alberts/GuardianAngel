@@ -17,6 +17,8 @@ public:
 	;
 
 	virtual bool insideInterval(const Time24 &now) = 0;
+	virtual bool startsAt(const Time24& t) = 0;
+	virtual bool endsAt(const Time24& t) = 0;
 };
 
 #endif /* TIME24INTERVAL_HPP_ */

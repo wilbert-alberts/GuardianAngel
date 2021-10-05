@@ -8,17 +8,20 @@
 #ifndef WATCHDOG_HPP_
 #define WATCHDOG_HPP_
 
-#include "Clock.hpp"
-#include "WatchInterval.hpp"
+#include <memory>
+
+class Time24Interval;
+class Clock;
+class ActivityDetector;
+class Angel;
 
 class WatchDog {
 public:
     virtual ~WatchDog() {}
-//    virtual void configure(const Clock& clock/*, const ActivityDetector& ad*/);
-//    virtual void activate();
-    
-    virtual void addInterval(const WatchInterval& i) = 0;
-    virtual void delInterval(const WatchInterval& i) = 0;
+    virtual void setClock(std::shared_ptr<Clock> cl) = 0;
+    virtual void setActivityDetector(std::shared_ptr<ActivityDetector> p) = 0;
+    virtual void addInterval(std::shared_ptr<Angel> angel, std::shared_ptr<Time24Interval> i) = 0;
+    virtual void delInterval(std::shared_ptr<Angel> angel, std::shared_ptr<Time24Interval> i) = 0;
 };
 
 

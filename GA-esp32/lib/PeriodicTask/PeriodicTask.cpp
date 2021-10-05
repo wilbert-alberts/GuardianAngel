@@ -2,8 +2,10 @@
 
 #include "PeriodicTask.hpp"
 
-PeriodicTask::PeriodicTask(const char *taskName, int periodInMs, int stackSize) : ActiveTask(taskName, stackSize), period(periodInMs), terminateRequested(
-																																		   false)
+PeriodicTask::PeriodicTask(const char *taskName, int periodInMs, int stackSize)
+: ActiveTask(taskName, stackSize)
+, period(periodInMs)
+, terminateRequested(																																		   false)
 {
 }
 

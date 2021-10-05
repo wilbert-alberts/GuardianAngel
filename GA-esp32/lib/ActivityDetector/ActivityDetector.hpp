@@ -10,9 +10,6 @@
 
 #include <memory>
 
-#include "platform.hpp"
-#include "ValueProvider.hpp"
-
 class ActivityListener {
 public:
 	virtual ~ActivityListener() {};
@@ -22,7 +19,8 @@ public:
 class ActivityDetector {
 public:
 	virtual ~ActivityDetector() {}
-	virtual void setListener(std::shared_ptr<ActivityListener> listener) = 0;
+	virtual void addListener(std::shared_ptr<ActivityListener> listener) = 0;
+	virtual void delListener(std::shared_ptr<ActivityListener> listener) = 0;
 };
 
 #endif /* LIB_ACTIVITYDETECTOR_ACTIVITYDETECTOR_HPP_ */

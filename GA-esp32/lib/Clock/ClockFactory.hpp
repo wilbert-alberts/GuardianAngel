@@ -9,7 +9,9 @@
 #ifndef CLOCKFACTORY_HPP_
 #define CLOCKFACTORY_HPP_
 
-#include "Clock.hpp"
+#include <memory>
+
+class Clock;
 
 namespace ClockFactory {
     std::shared_ptr<Clock> create();

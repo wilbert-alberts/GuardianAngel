@@ -5,14 +5,20 @@
  *      Author: wilbert
  */
 
-#include <platform.hpp>
 
 #include <iostream>
 
-#include <ClockFactory.hpp>
-#include <ActivityDetectorFactory.hpp>
-#include <ConfigFactory.hpp>
+#include "platform.hpp"
 
+#include "ClockFactory.hpp"
+#include "Clock.hpp"
+#include "ActivityDetectorFactory.hpp"
+#include "ConfigFactory.hpp"
+#include "WatchDogFactory.hpp"
+#include "WatchDog.hpp"
+#include "AngelMgrFactory.hpp"
+#include "AngelMgr.hpp"
+#include "GSMFactory.hpp"
 
 #ifdef GA_POSIX
 
@@ -34,6 +40,14 @@ int main()
 	auto clock = ClockFactory::create();
 	auto activityDetector = ActivityDetectorFactory::create(readPIR);
 	auto helpBtn = ActivityDetectorFactory::create(readHelpBtn);
+	auto gsm = GSMFactory::create();
+
+	auto watchdog = WatchDogFactory::create();
+	watchdog->setClock(clock);
+
+	auto angelMgr = AngelMgrFactory::create();
+	angelMgr->setWatchDog(watchdog);
+	angelMgr->setHelpRequestDetector(helpBtn);
 
 
 	std::cout << "Started." << std::endl;

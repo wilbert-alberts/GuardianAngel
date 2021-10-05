@@ -3,8 +3,6 @@
 #ifndef ACTIVETASK_HPP_
 #define ACTIVETASK_HPP_
 
-#include "platform.hpp"
-
 class ActiveTask
 {
 public:
