@@ -80,3 +80,32 @@ TEST(Time24, TestLater) {
 	ASSERT_GT(t13->compareTo(*t2),0);
 }
 
+TEST(Time24, TestString) {
+	auto t1= Time24Factory::create(2,3,0);
+	auto t11 = Time24Factory::create("2:03");
+	auto t12 = Time24Factory::create("02:03");
+
+	ASSERT_EQ(0, t1->compareTo(*t11));
+	ASSERT_EQ(0, t1->compareTo(*t12));
+
+	auto t2= Time24Factory::create(22,23,0);
+	auto t21 = Time24Factory::create("22:23");
+
+	ASSERT_EQ(0, t2->compareTo(*t21));
+}
+
+TEST(Time24, TestIllegalString) {
+	auto t1 = Time24Factory::create("bogus");
+	auto t2 = Time24Factory::create("24:00");
+	auto t3 = Time24Factory::create("25:03");
+	auto t4 = Time24Factory::create("25:60");
+	auto t5 = Time24Factory::create("-25:00");
+	auto t6 = Time24Factory::create("22:-2");
+
+	ASSERT_EQ(nullptr, t1.get());
+	ASSERT_EQ(nullptr, t2.get());
+	ASSERT_EQ(nullptr, t3.get());
+	ASSERT_EQ(nullptr, t4.get());
+	ASSERT_EQ(nullptr, t5.get());
+	ASSERT_EQ(nullptr, t6.get());
+}

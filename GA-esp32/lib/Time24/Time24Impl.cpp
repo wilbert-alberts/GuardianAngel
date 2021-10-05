@@ -22,14 +22,14 @@ public:
 	virtual int getSeconds() const;
 
 	virtual void add(int h, int m, int s);
-	virtual void add(const Time24& other);
+	virtual void add(const Time24 &other);
 	virtual void addHours(int h);
 	virtual void addMinutes(int m);
 	virtual void addSeconds(int s);
 
 	virtual int compareTo(const Time24 &other) const;
 
-	virtual std::string toString() const ;
+	virtual std::string toString() const;
 
 private:
 	int hours;
@@ -43,8 +43,24 @@ private:
 };
 
 namespace Time24Factory {
-	std::shared_ptr<Time24> create(int h, int m, int s) {
+std::shared_ptr<Time24> create(int h, int m, int s) {
 	return std::shared_ptr<Time24>(new Time24Impl(h, m, s));
+}
+
+std::shared_ptr<Time24> create(std::string hhmm) {
+	std::string hoursStr = hhmm.substr(0, hhmm.find(":"));
+	std::string minsStr = hhmm.substr(hhmm.find(":") + 1);
+	try {
+		int hours = stoi(hoursStr);
+		int mins = stoi(minsStr);
+
+		if (hours >= 0 && hours < 24 && mins >= 0 && mins < 60)
+			return create(hours, mins, 0);
+		else
+			return std::shared_ptr<Time24>(nullptr);
+	} catch (...) {
+		return std::shared_ptr<Time24>(nullptr);
+	}
 }
 }
 
@@ -76,21 +92,21 @@ void Time24Impl::add(int h, int m, int s) {
 	addSeconds(s);
 }
 
-void Time24Impl::add(const Time24& other) {
+void Time24Impl::add(const Time24 &other) {
 	add(other.getHours(), other.getMinutes(), other.getSeconds());
 }
 
 void Time24Impl::addHours(int h) {
-	hours = (hours + h ) % 24; 
+	hours = (hours + h) % 24;
 }
 
 void Time24Impl::addMinutes(int m) {
-	addHours( (m + minutes) / 60);
+	addHours((m + minutes) / 60);
 	minutes = (m + minutes) % 60;
 }
 
 void Time24Impl::addSeconds(int s) {
-	addMinutes( (s+seconds ) / 60);
+	addMinutes((s + seconds) / 60);
 	seconds = (s + seconds) % 60;
 }
 
@@ -138,11 +154,14 @@ void Time24Impl::verifyNatural(int value) {
 
 std::string Time24Impl::toString() const {
 	std::stringstream ss;
-	if (hours   < 10) ss << ' ';
+	if (hours < 10)
+		ss << ' ';
 	ss << hours << ':';
-	if (minutes < 10) ss << '0';
+	if (minutes < 10)
+		ss << '0';
 	ss << minutes << ':';
-	if (seconds < 10) ss << '0';
+	if (seconds < 10)
+		ss << '0';
 	ss << seconds;
 	return ss.str();
 }
