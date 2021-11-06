@@ -9,22 +9,26 @@
 #include "Time24Interval.hpp"
 #include "Time24IntervalFactory.hpp"
 
+#include <memory>
+
 class Time24IntervalImpl: public Time24Interval {
 public:
 	Time24IntervalImpl(const Time24 &start, const Time24 &end);
 	virtual ~Time24IntervalImpl() {
 	}
 
-	virtual bool insideInterval(const Time24 &now);
-	virtual bool startsAt(const Time24 &t);
-	virtual bool endsAt(const Time24 &t);
+	virtual bool insideInterval(const Time24 &now) const;
+	virtual bool startsAt(const Time24 &t) const;
+	virtual bool endsAt(const Time24 &t) const;
+	virtual const Time24& getStart() const ;
+	virtual const Time24& getEnd() const ;
 
 private:
 	const Time24 &start;
 	const Time24 &end;
 
-	bool insideStartAndEnd(const Time24 &now);
-	bool insideEndAndStart(const Time24 &now);
+	bool insideStartAndEnd(const Time24 &now) const;
+	bool insideEndAndStart(const Time24 &now)const ;
 };
 
 namespace Time24IntervalFactory {
@@ -37,31 +41,40 @@ Time24IntervalImpl::Time24IntervalImpl(const Time24 &start, const Time24 &end) :
 		start(start), end(end) {
 }
 
-bool Time24IntervalImpl::insideInterval(const Time24 &now) {
+bool Time24IntervalImpl::insideInterval(const Time24 &now) const {
 	if (start.compareTo(end) < 0)
 		return insideStartAndEnd(now);
 	else
 		return insideEndAndStart(now);
 }
 
-bool Time24IntervalImpl::insideStartAndEnd(const Time24 &now) {
+bool Time24IntervalImpl::insideStartAndEnd(const Time24 &now) const {
 	if ((now.compareTo(start) >= 0) || (end.compareTo(now) <= 0))
 		return true;
 	else
 		return false;
 }
-bool Time24IntervalImpl::insideEndAndStart(const Time24 &now) {
+
+inline const Time24& Time24IntervalImpl::getStart() const {
+	return start;
+}
+
+inline const Time24& Time24IntervalImpl::getEnd() const {
+	return end;
+}
+
+bool Time24IntervalImpl::insideEndAndStart(const Time24 &now) const {
 	if ((now.compareTo(start) >= 0) || (now.compareTo(end) <= 0))
 		return true;
 	else
 		return false;
 }
 
-bool Time24IntervalImpl::startsAt(const Time24 &t) {
+bool Time24IntervalImpl::startsAt(const Time24 &t) const {
 	return start.compareTo(t) == 0;
 }
 
-bool Time24IntervalImpl::endsAt(const Time24 &t) {
+bool Time24IntervalImpl::endsAt(const Time24 &t) const {
 	return end.compareTo(t) == 0;
 }
 

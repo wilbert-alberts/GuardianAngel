@@ -42,6 +42,8 @@ int main()
 	auto helpBtn = ActivityDetectorFactory::create(readHelpBtn);
 	auto gsm = GSMFactory::create();
 
+	clock->setGSM(gsm);
+
 	auto watchdog = WatchDogFactory::create();
 	watchdog->setClock(clock);
 
@@ -49,6 +51,9 @@ int main()
 	angelMgr->setWatchDog(watchdog);
 	angelMgr->setHelpRequestDetector(helpBtn);
 
+	configProvider->loadProperties();
+
+	angelMgr->setConfigProvider(configProvider);
 
 	std::cout << "Started." << std::endl;
 

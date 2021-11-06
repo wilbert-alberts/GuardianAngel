@@ -12,7 +12,7 @@
 
 namespace ConfigFactory {
 
-extern Config* create();
+extern std::shared_ptr<Config> create();
 
 }
 

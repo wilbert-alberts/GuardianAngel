@@ -13,15 +13,15 @@
 class Time24Interval;
 class Clock;
 class ActivityDetector;
-class Angel;
+class AlarmHandler;
 
 class WatchDog {
 public:
     virtual ~WatchDog() {}
     virtual void setClock(std::shared_ptr<Clock> cl) = 0;
     virtual void setActivityDetector(std::shared_ptr<ActivityDetector> p) = 0;
-    virtual void addInterval(std::shared_ptr<Angel> angel, std::shared_ptr<Time24Interval> i) = 0;
-    virtual void delInterval(std::shared_ptr<Angel> angel, std::shared_ptr<Time24Interval> i) = 0;
+    virtual void addInterval(std::shared_ptr<AlarmHandler> angel, std::shared_ptr<Time24Interval> i) = 0;
+    virtual void delInterval(std::shared_ptr<AlarmHandler> angel, std::shared_ptr<Time24Interval> i) = 0;
 };
 
 

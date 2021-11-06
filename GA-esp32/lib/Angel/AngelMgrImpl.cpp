@@ -11,11 +11,16 @@
 #include <GSM.hpp>
 #include <Message.hpp>
 #include <PeriodicTask.hpp>
+#include <Config.hpp>
+#include <SaveableAngel.h>
+#include <LoadableAngel.h>
+
 #include <algorithm>
 #include <iterator>
 #include <memory>
 #include <string>
 #include <vector>
+#include <sstream>
 
 class AngelMgrImpl: public AngelMgr, public PeriodicTask {
 public:
@@ -27,20 +32,29 @@ public:
 	virtual void setHelpRequestDetector(std::shared_ptr<ActivityDetector> hr);
 	virtual void setGSM(std::shared_ptr<GSM> gsm);
 
+	virtual void setConfigProvider(std::shared_ptr<Config> cfg);
+
+
 	virtual void tick();
 
 	void processMessage(std::shared_ptr<Message> msg);
 	void subscribeAngel(const std::string &phonenr, const std::string &start,
-			const std::string &end);
+			const std::string &end, bool save);
 	void unsubscribeAngel(const std::string &phonenr, const std::string &start,
-			const std::string &end);
+			const std::string &end, bool save);
 
 private:
 	std::shared_ptr<WatchDog> wd;
 	std::shared_ptr<ActivityDetector> hr;
 	std::shared_ptr<GSM> gsm;
+	std::shared_ptr<Config> cfg;
 
 	std::vector<std::shared_ptr<Angel>> angels;
+
+	void loadConfig();
+	void saveConfig();
+	void saveNrAngels();
+	int loadNrAngels();
 };
 
 namespace AngelMgrFactory {
@@ -74,38 +88,40 @@ void AngelMgrImpl::tick() {
 		if (msg->isValid()) {
 			processMessage(msg);
 		}
+		gsm->delMessage(msg->getMessageID());
 	});
 }
 
 void AngelMgrImpl::processMessage(std::shared_ptr<Message> msg) {
 	if (msg->getAction() == "subscribe") {
-		subscribeAngel(msg->getSender(), msg->getStart(), msg->getEnd());
-		gsm->delMessage(msg->getMessageID());
+		subscribeAngel(msg->getSender(), msg->getStart(), msg->getEnd(), true);
 	}
 	if (msg->getAction() == "unsubscribe") {
-		unsubscribeAngel(msg->getSender(), msg->getStart(), msg->getEnd());
-		gsm->delMessage(msg->getMessageID());
+		unsubscribeAngel(msg->getSender(), msg->getStart(), msg->getEnd(), true);
 	}
 }
 
 void AngelMgrImpl::subscribeAngel(const std::string &phonenr,
-		const std::string &start, const std::string &end) {
+		const std::string &start, const std::string &end, bool save) {
 	auto angel = std::find_if(angels.begin(), angels.end(),
 			[&](std::shared_ptr<Angel> a) {
 				return a->getPhoneNr() == phonenr;
 			});
 	if (angel == angels.end()) {
-		auto newAngel = AngelFactory::create(phonenr, wd, hr);
+		auto newAngel = AngelFactory::create(phonenr, wd, hr, gsm);
 		angels.push_back(newAngel);
 		angel = angels.end();
 		angel--;
 	}
 
 	(*angel)->addInterval(start, end);
+	if (save)
+	saveConfig();
 }
 
+
 void AngelMgrImpl::unsubscribeAngel(const std::string &phonenr,
-		const std::string &start, const std::string &end) {
+		const std::string &start, const std::string &end, bool save) {
 	auto angel = std::find_if(angels.begin(), angels.end(),
 			[&](std::shared_ptr<Angel> a) {
 				return a->getPhoneNr() == phonenr;
@@ -116,4 +132,45 @@ void AngelMgrImpl::unsubscribeAngel(const std::string &phonenr,
 		else
 			angels.erase(angel);
 	}
+	if(save)
+	saveConfig();
+}
+
+void AngelMgrImpl::setConfigProvider(
+		std::shared_ptr<Config> _cfg) {
+	cfg = _cfg;
+	loadConfig();
+}
+
+void AngelMgrImpl::loadConfig() {
+	// TODO: check how to deal with angels that managed to subscribe before
+	// loading the config.
+	if (cfg != nullptr) {
+		int nrAngels = loadNrAngels();
+		for (auto idx=0; idx<nrAngels; idx++) {
+			LoadableAngel loadAngel(cfg, idx);
+			int nrIntervals = loadAngel.getNrIntervals();
+			for (int iv=0; iv< nrIntervals; iv++) {
+				subscribeAngel(loadAngel.getPhoneNr(), loadAngel.getStart(iv), loadAngel.getEnd(iv), false);
+			}
+		}
+	}
+}
+
+void AngelMgrImpl::saveConfig() {
+	if (cfg != nullptr) {
+		saveNrAngels();
+		for (size_t idx=0; idx<angels.size(); idx++) {
+			SaveableAngel saveAngel(angels[idx], cfg, idx);
+			saveAngel.save();
+		}
+	}
+}
+
+void AngelMgrImpl::saveNrAngels() {
+	cfg->putProperty("nrAngels", std::to_string(angels.size()));
+}
+
+int AngelMgrImpl::loadNrAngels() {
+	return std::stoi(*cfg->getProperty("nrAngels"));
 }

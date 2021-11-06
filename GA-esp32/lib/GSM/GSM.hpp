@@ -10,7 +10,9 @@
 
 #include <vector>
 #include <memory>
+
 #include "Message.hpp"
+class Time24;
 
 class GSM {
 public:
@@ -18,6 +20,8 @@ public:
 	virtual std::vector<MessageID> getMessageIDs() const = 0;
 	virtual std::shared_ptr<Message> getMessage(const MessageID mid) const = 0;
 	virtual void delMessage(const MessageID mid) = 0;
+	virtual void sendMessage(const std::shared_ptr<std::string> phoneNr, const std::shared_ptr<std::string> msg) const = 0;
+	virtual std::shared_ptr<Time24> getTime() const = 0;
 };
 
 

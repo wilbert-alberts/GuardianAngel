@@ -28,9 +28,9 @@ public:
 	}
 
 	virtual void setClock(std::shared_ptr<Clock> cl);
-	virtual void addInterval(std::shared_ptr<Angel> a,
+	virtual void addInterval(std::shared_ptr<AlarmHandler> a,
 			std::shared_ptr<Time24Interval> i);
-	virtual void delInterval(std::shared_ptr<Angel> a,
+	virtual void delInterval(std::shared_ptr<AlarmHandler> a,
 			std::shared_ptr<Time24Interval> i);
 
 	// ActivityListener
@@ -72,13 +72,13 @@ void WatchDogImpl::activityDetected() {
 	}
 }
 
-void WatchDogImpl::addInterval(std::shared_ptr<Angel> a,
+void WatchDogImpl::addInterval(std::shared_ptr<AlarmHandler> a,
 		std::shared_ptr<Time24Interval> i) {
 	std::shared_ptr<WatchInterval> wi = WatchIntervalFactory::create(a, i);
 	intervals.emplace_back(wi);
 }
 
-void WatchDogImpl::delInterval(std::shared_ptr<Angel> a,
+void WatchDogImpl::delInterval(std::shared_ptr<AlarmHandler> a,
 		std::shared_ptr<Time24Interval> i) {
 	auto newEnd = std::remove_if(intervals.begin(), intervals.end(),
 			[&](std::shared_ptr<WatchInterval> e) {

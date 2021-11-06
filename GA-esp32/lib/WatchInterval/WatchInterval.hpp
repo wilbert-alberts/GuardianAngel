@@ -6,6 +6,7 @@
 
 class Time24;
 class Time24Interval;
+class AlarmHandler;
 
 class WatchInterval
 {

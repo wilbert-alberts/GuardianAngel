@@ -16,36 +16,44 @@
 #include "Time24IntervalFactory.hpp"
 #include "WatchDog.hpp"
 #include "ActivityDetector.hpp"
+#include "GSM.hpp"
 
-class AngelImpl: public Angel, public ActivityListener {
+#include "AlarmHandler.hpp"
+
+class AngelImpl: public Angel, public ActivityListener, public AlarmHandler {
 public:
 	AngelImpl(const std::string &phoneNr, std::shared_ptr<WatchDog>,
-			std::shared_ptr<ActivityDetector> hr);
+			std::shared_ptr<ActivityDetector> hr, std::shared_ptr<GSM> gsm);
 
 	virtual ~AngelImpl();
 
 	virtual const std::string& getPhoneNr() const;
 	virtual void addInterval(const std::string &start, const std::string &end);
 	virtual void delInterval(const std::string &start, const std::string &end);
+	virtual int getNrIntervals() const;
+	virtual std::shared_ptr<Time24Interval> getInterval(int idx) const;
 	virtual void activityDetected();
+	virtual void raiseAlarm();
 
 private:
 	std::string phoneNr;
 	std::shared_ptr<WatchDog> wd;
+	std::shared_ptr<GSM> gsm;
 	std::shared_ptr<ActivityDetector> hr;
 	std::vector<std::shared_ptr<Time24Interval>> intervals;
 };
 
 namespace AngelFactory {
 std::shared_ptr<Angel> create(const std::string &phoneNr,
-		std::shared_ptr<WatchDog> wd, std::shared_ptr<ActivityDetector> hr) {
-	return std::shared_ptr<Angel>(new AngelImpl(phoneNr, wd, hr));
+		std::shared_ptr<WatchDog> wd, std::shared_ptr<ActivityDetector> hr,
+		std::shared_ptr<GSM> gsm) {
+	return std::shared_ptr<Angel>(new AngelImpl(phoneNr, wd, hr, gsm));
 }
 }
 
 AngelImpl::AngelImpl(const std::string &pnr, std::shared_ptr<WatchDog> _wd,
-		std::shared_ptr<ActivityDetector> _hr) :
-		phoneNr(pnr), wd(_wd) {
+		std::shared_ptr<ActivityDetector> _hr, std::shared_ptr<GSM> _gsm) :
+		phoneNr(pnr), wd(_wd), gsm(_gsm) {
 	hr->addListener(std::shared_ptr<ActivityListener>(this));
 }
 
@@ -53,7 +61,7 @@ AngelImpl::~AngelImpl() {
 	hr->delListener(std::shared_ptr<ActivityListener>(this));
 	std::for_each(intervals.begin(), intervals.end(),
 			[&](std::shared_ptr<Time24Interval> i) {
-				wd->delInterval(std::shared_ptr<Angel>(this), i);
+				wd->delInterval(std::shared_ptr<AlarmHandler>(this), i);
 			});
 }
 
@@ -75,7 +83,7 @@ void AngelImpl::addInterval(const std::string &start, const std::string &end) {
 
 	intervals.push_back(t24iv);
 
-	wd->addInterval(std::shared_ptr<Angel>(this), t24iv);
+	wd->addInterval(std::shared_ptr<AlarmHandler>(this), t24iv);
 }
 
 void AngelImpl::delInterval(const std::string &start, const std::string &end) {
@@ -102,7 +110,22 @@ void AngelImpl::delInterval(const std::string &start, const std::string &end) {
 	intervals.erase(newEnd, intervals.end());
 }
 
+int AngelImpl::getNrIntervals() const {
+	return intervals.size();
+}
+
+std::shared_ptr<Time24Interval> AngelImpl::getInterval(int idx) const {
+	if (idx < intervals.size())
+		return intervals[idx];
+	else
+		return nullptr;
+}
+
 void AngelImpl::activityDetected() {
+	raiseAlarm();
+}
+
+void AngelImpl::raiseAlarm() {
 
 }
 

@@ -4,13 +4,13 @@
 #include <memory>
 
 
-class Angel;
+class AlarmHandler;
 class Time24Interval;
 class WatchInterval;
 
 namespace WatchIntervalFactory {
 
-std::shared_ptr<WatchInterval> create(std::shared_ptr<Angel> angel, std::shared_ptr<Time24Interval> iv);
+std::shared_ptr<WatchInterval> create(std::shared_ptr<AlarmHandler> angel, std::shared_ptr<Time24Interval> iv);
 
 }
 
