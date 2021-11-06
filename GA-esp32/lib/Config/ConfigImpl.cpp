@@ -5,19 +5,20 @@
  *      Author: wilbert
  */
 
-#include "Config.hpp"
-
-#include <memory>
-#include <map>
-#include <sstream>
+#include <Config.hpp>
 #include <algorithm>
+#include <map>
+#include <memory>
 #include <regex>
+#include <string>
+#include <utility>
+#include <sstream>
 
 class ConfigImpl: public Config {
+	const std::regex keyValueRx = std::regex("\\s*([^=]+)\\s*=\\s*(\\S+)\\s*");
+
 public:
-	ConfigImpl() {
-	}
-	;
+
 	virtual ~ConfigImpl() {
 	}
 	virtual void clear();
@@ -33,7 +34,9 @@ private:
 
 	PropertyMap properties;
 
-//	const std::basic_regex keyValueRx("([^=]+)=(.+)");
+	void propertiesToString(std::string &str);
+	void stringToProperties(const std::vector<std::string> &lines);
+
 };
 
 namespace ConfigFactory {
@@ -62,25 +65,27 @@ void ConfigImpl::putProperty(const std::string &id, const std::string &value) {
 #include <fstream>
 
 void ConfigImpl::loadProperties() {
-	std::ifstream of("GA.ini" );
+	std::ifstream of("GA.ini");
 
+	std::vector<std::string> lines;
 	std::string line;
-	while(std::getline(of, line)) {
-		std::smatch m;
 
-		auto b= std::regex_match(line.begin(), line.end(), m, "asdfasdf");
+	while (std::getline(of, line)) {
+		lines.emplace_back(line);
 	}
 
-	of.close();
+	stringToProperties(lines);
 
+	of.close();
 }
 
 void ConfigImpl::saveProperties() {
-	std::ofstream of("GA.ini" );
+	std::ofstream of("GA.ini");
 
-	std::for_each(properties.begin(), properties.end(), [&](PropertyMap::value_type p){
-		of << p.first << "=" <<p.second << std::endl;
-	});
+	std::string output;
+	propertiesToString(output);
+
+	of << output;
 
 	of.close();
 }
@@ -104,3 +109,24 @@ const std::string* ConfigImpl::getProperty(const std::string &id) {
 	}
 }
 
+void ConfigImpl::propertiesToString(std::string &str) {
+	std::stringstream stream;
+
+	std::for_each(properties.begin(), properties.end(),
+			[&](PropertyMap::value_type p) {
+				stream << p.first << "=" << p.second << std::endl;
+			});
+	str.assign(stream.str());
+}
+
+void ConfigImpl::stringToProperties(const std::vector<std::string> &lines) {
+	std::for_each(lines.begin(), lines.end(), [](std::string line) {
+		std::smatch m;
+		bool b = std::regex_match(line, m, keyValueRx);
+		if (b) {
+			std::string key = m[1];
+			std::string value = m[2];
+			properties.emplace(key, value);
+		}
+	});
+}
