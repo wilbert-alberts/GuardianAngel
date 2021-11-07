@@ -5,8 +5,8 @@
  *      Author: wilbert
  */
 
-#ifndef LIB_ANGEL_SAVEABLEANGEL_H_
-#define LIB_ANGEL_SAVEABLEANGEL_H_
+#ifndef LIB_ANGEL_SAVEABLEANGEL_HPP_
+#define LIB_ANGEL_SAVEABLEANGEL_HPP_
 
 #include <memory>
 #include <string>
@@ -34,4 +34,4 @@ private:
 
 };
 
-#endif /* LIB_ANGEL_SAVEABLEANGEL_H_ */
+#endif /* LIB_ANGEL_SAVEABLEANGEL_HPP_ */

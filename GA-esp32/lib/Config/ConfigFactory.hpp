@@ -10,6 +10,8 @@
 
 #include "Config.hpp"
 
+#include <memory>
+
 namespace ConfigFactory {
 
 extern std::shared_ptr<Config> create();

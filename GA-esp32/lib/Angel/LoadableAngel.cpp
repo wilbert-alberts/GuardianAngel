@@ -5,9 +5,8 @@
  *      Author: wilbert
  */
 
-#include <LoadableAngel.h>
-
 #include <Config.hpp>
+#include <LoadableAngel.hpp>
 
 #include <sstream>
 

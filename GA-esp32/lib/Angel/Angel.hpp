@@ -15,7 +15,7 @@ public:
     virtual void addInterval(const std::string& start, const std::string& end) = 0;
     virtual void delInterval(const std::string& start, const std::string& end) = 0;
     virtual int getNrIntervals() const = 0;
-    virtual std::shared_ptr<Time24Interval> getInterval(int idx) const = 0;
+    virtual std::shared_ptr<Time24Interval> getInterval(size_t idx) const = 0;
 };
 
 #endif

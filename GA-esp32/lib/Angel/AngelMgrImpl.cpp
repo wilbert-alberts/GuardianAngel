@@ -12,9 +12,8 @@
 #include <Message.hpp>
 #include <PeriodicTask.hpp>
 #include <Config.hpp>
-#include <SaveableAngel.h>
-#include <LoadableAngel.h>
-
+#include <LoadableAngel.hpp>
+#include <SaveableAngel.hpp>
 #include <algorithm>
 #include <iterator>
 #include <memory>

@@ -31,7 +31,7 @@ public:
 	virtual void addInterval(const std::string &start, const std::string &end);
 	virtual void delInterval(const std::string &start, const std::string &end);
 	virtual int getNrIntervals() const;
-	virtual std::shared_ptr<Time24Interval> getInterval(int idx) const;
+	virtual std::shared_ptr<Time24Interval> getInterval(size_t idx) const;
 	virtual void activityDetected();
 	virtual void raiseAlarm();
 
@@ -114,7 +114,7 @@ int AngelImpl::getNrIntervals() const {
 	return intervals.size();
 }
 
-std::shared_ptr<Time24Interval> AngelImpl::getInterval(int idx) const {
+std::shared_ptr<Time24Interval> AngelImpl::getInterval(size_t idx) const {
 	if (idx < intervals.size())
 		return intervals[idx];
 	else

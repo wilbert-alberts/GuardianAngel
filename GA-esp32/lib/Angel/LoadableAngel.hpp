@@ -5,8 +5,8 @@
  *      Author: wilbert
  */
 
-#ifndef LIB_ANGEL_LOADABLEANGEL_H_
-#define LIB_ANGEL_LOADABLEANGEL_H_
+#ifndef LIB_ANGEL_LOADABLEANGEL_HPP_
+#define LIB_ANGEL_LOADABLEANGEL_HPP_
 
 #include <memory>
 
@@ -31,4 +31,4 @@ private:
 	const std::string& loadStr(const std::string& key) const;
 };
 
-#endif /* LIB_ANGEL_LOADABLEANGEL_H_ */
+#endif /* LIB_ANGEL_LOADABLEANGEL_HPP_ */

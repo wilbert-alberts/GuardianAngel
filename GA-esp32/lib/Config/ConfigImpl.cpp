@@ -15,7 +15,7 @@
 #include <sstream>
 
 class ConfigImpl: public Config {
-	const std::regex keyValueRx = std::regex("\\s*([^=]+)\\s*=\\s*(\\S+)\\s*");
+	const std::regex keyValueRx = std::regex("\\s*([^=]+)\\s*=\\s*(.*+)\\s*");
 
 public:
 
@@ -120,7 +120,7 @@ void ConfigImpl::propertiesToString(std::string &str) {
 }
 
 void ConfigImpl::stringToProperties(const std::vector<std::string> &lines) {
-	std::for_each(lines.begin(), lines.end(), [](std::string line) {
+	std::for_each(lines.begin(), lines.end(), [&](std::string line) {
 		std::smatch m;
 		bool b = std::regex_match(line, m, keyValueRx);
 		if (b) {
