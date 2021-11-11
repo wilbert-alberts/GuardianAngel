@@ -5,13 +5,17 @@
  *      Author: wilbert
  */
 
-#include <memory>
-#include <vector>
+#include <bits/types/struct_tm.h>
+#include <GSM.hpp>
+#include <IMessage.hpp>
+#include <Time24.hpp>
+#include <Time24Factory.hpp>
 #include <algorithm>
-
-#include "GSM.hpp"
-#include "GSMFactory.hpp"
-#include "Time24Factory.hpp"
+#include <ctime>
+#include <iterator>
+#include <memory>
+#include <string>
+#include <vector>
 
 #ifdef GA_POSIX
 #include <chrono>
@@ -25,14 +29,13 @@ public:
 	~GSMImpl() {
 	}
 	virtual std::vector<MessageID> getMessageIDs() const;
-	virtual std::shared_ptr<Message> getMessage(const MessageID mid) const;
+	virtual std::shared_ptr<IMessage> getMessage(const MessageID mid) const;
 	virtual void delMessage(const MessageID mid);
-	virtual void sendMessage(const std::shared_ptr<std::string> phoneNr,
-			const std::shared_ptr<std::string> msg) const;
+	virtual void sendMessage(const std::string &phoneNr, const std::string& msg);
 	virtual std::shared_ptr<Time24> getTime() const;
 
 private:
-	std::vector<std::shared_ptr<Message>> messages;
+	std::vector<std::shared_ptr<IMessage>> messages;
 };
 
 namespace GSMFactory {
@@ -49,36 +52,35 @@ std::vector<MessageID> GSMImpl::getMessageIDs() const {
 	std::vector<MessageID> result;
 
 	std::transform(messages.begin(), messages.end(), result.begin(),
-			[](std::shared_ptr<Message> m) {
+			[](std::shared_ptr<IMessage> m) {
 				return m->getMessageID();
 			});
 	return result;
 }
 
-std::shared_ptr<Message> GSMImpl::getMessage(const MessageID mid) const {
+std::shared_ptr<IMessage> GSMImpl::getMessage(const MessageID mid) const {
 	auto msg = std::find_if(messages.begin(), messages.end(),
-			[&](std::shared_ptr<Message> m) {
+			[&](std::shared_ptr<IMessage> m) {
 				return m->getMessageID() == mid;
 			});
 
 	if (msg != messages.end()) {
 		return *msg;
 	} else {
-		return std::shared_ptr<Message>(nullptr);
+		return std::shared_ptr<IMessage>(nullptr);
 	}
 }
 
 void GSMImpl::delMessage(const MessageID mid) {
 	auto newEnd = std::remove_if(messages.begin(), messages.end(),
-			[&](std::shared_ptr<Message> m) {
+			[&](std::shared_ptr<IMessage> m) {
 				return m->getMessageID() == mid;
 			});
 
 	messages.erase(newEnd, messages.end());
 }
 
-void GSMImpl::sendMessage(const std::shared_ptr<std::string> phoneNr,
-		const std::shared_ptr<std::string> msg) const {
+void GSMImpl::sendMessage(const std::string &phoneNr, const std::string& msg) {
 }
 
 std::shared_ptr<Time24> GSMImpl::getTime() const {
@@ -98,6 +100,6 @@ std::shared_ptr<Time24> GSMImpl::getTime() const {
 #else
 
 #endif
-	return Time24Factory::create(h,m,s);
+	return Time24Factory::create(h, m, s);
 
 }

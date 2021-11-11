@@ -9,8 +9,7 @@
 #include <Angel.hpp>
 #include <SaveableAngel.hpp>
 #include <Time24.hpp>
-#include <Time24Interval.hpp>
-
+#include <WatchInterval.hpp>
 #include <sstream>
 
 SaveableAngel::SaveableAngel(std::shared_ptr<Angel> a, std::shared_ptr<Config> _cfg, int idx) : index(idx), angel(a), cfg(_cfg){
@@ -45,7 +44,7 @@ void SaveableAngel::saveIntervals() {
 	}
 }
 
-void SaveableAngel::saveInterval(int idx, std::shared_ptr<Time24Interval> iv) {
+void SaveableAngel::saveInterval(int idx, std::shared_ptr<WatchInterval> iv) {
 	std::stringstream startKeyStream;
 	startKeyStream << "interval_" << idx << "_" << "start";
 	saveStr(startKeyStream.str(),  iv->getStart().toString());

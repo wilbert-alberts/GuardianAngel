@@ -10,22 +10,23 @@
 
 #include <memory>
 
-
-class WatchDog;
-class ActivityDetector;
-class GSM;
-class Config;
+class IButton;
+class IMessageProcessor;
+class IActivityDetector;
+class IAlarmProcessor;
+class ITimeProvider;
 
 class AngelMgr
 {
 public:
 	virtual ~AngelMgr() {}
 
-	virtual void setWatchDog(std::shared_ptr<WatchDog> wd) = 0;
-	virtual void setHelpRequestDetector(std::shared_ptr<ActivityDetector> hr) = 0;
-	virtual void setGSM(std::shared_ptr<GSM> gsm) = 0;
-	virtual void setConfigProvider(std::shared_ptr<Config> cfg) = 0;
-
+	virtual void resetAngels() = 0;
+	virtual void setHelpButton(std::shared_ptr<IButton> helpButton) = 0;
+	virtual void setMessageProvider(std::shared_ptr<IMessageProcessor> messageProvider) = 0;
+	virtual void setActivityDetector(std::shared_ptr<IActivityDetector> activityDetector) = 0;
+	virtual void setAlarmProcessor(std::shared_ptr<IAlarmProcessor> alarmProcessor) = 0;
+	virtual void setTimeProvider(std::shared_ptr<ITimeProvider> timeProvider) = 0;
 };
 
 

@@ -1,69 +1,121 @@
+#include <Time24.hpp>
+#include <WatchInterval.hpp>
 #include <memory>
-
-#include "WatchInterval.hpp"
-#include "Time24.hpp"
-#include "Time24Interval.hpp"
-#include "WatchInterval.hpp"
-#include "WatchIntervalFactory.hpp"
-#include "AlarmHandler.hpp"
 
 class WatchIntervalImpl: public WatchInterval {
 public:
-	WatchIntervalImpl(std::shared_ptr<AlarmHandler> angel, std::shared_ptr<Time24Interval> iv);
+	WatchIntervalImpl(const Time24 &start, const Time24 &end);
 	virtual ~WatchIntervalImpl() {
 	}
-    virtual bool matches(std::shared_ptr<Time24Interval> other);
-	virtual void advanceTime(std::shared_ptr<Time24> now);
-	virtual void activityDetected(std::shared_ptr<Time24> now);
-	virtual void raiseAlarmIfNeeded();
+	virtual bool startsAt(const Time24 &t) const;
+	virtual bool endsAt(const Time24 &t) const;
+
+	virtual const Time24& getStart() const;
+	virtual const Time24& getEnd() const;
+
+	virtual bool matches(std::shared_ptr<Time24> start,
+			std::shared_ptr<Time24> end) const;
+
+	virtual void progress(std::shared_ptr<Time24> now, int nrActivations);
+
+	virtual IntervalState getState() const;
+	virtual void reset();
 
 private:
-	bool active;
+	const Time24 &start;
+	const Time24 &end;
+	IntervalState state;
 	int nrActivations;
 	int nrActivationToBeOk;
-	std::shared_ptr<AlarmHandler> ah;
-	std::shared_ptr<Time24Interval> interval;
 
+	bool insideInterval(const Time24 &now) const;
+	bool insideStartAndEnd(const Time24 &now) const;
+	bool insideEndAndStart(const Time24 &now) const;
 };
 
 namespace WatchIntervalFactory {
-std::shared_ptr<WatchInterval> create(std::shared_ptr<AlarmHandler> ah, std::shared_ptr<Time24Interval> iv) {
-	return std::shared_ptr<WatchInterval>(new WatchIntervalImpl(ah, iv));
+std::shared_ptr<WatchInterval> create(const Time24 &start, const Time24 &end) {
+
+	return std::shared_ptr<WatchInterval>(new WatchIntervalImpl(start, end));
 }
 }
 
-WatchIntervalImpl::WatchIntervalImpl(std::shared_ptr<AlarmHandler> a, std::shared_ptr<Time24Interval> iv) :
-		active(false), nrActivations(0), nrActivationToBeOk(1), ah(a), interval(iv) {
+WatchIntervalImpl::WatchIntervalImpl(const Time24 &start, const Time24 &end) :
+		start(start), end(end), state(IntervalState::PASSIVE), nrActivations(0), nrActivationToBeOk(
+				1) {
 }
 
-bool WatchIntervalImpl::matches(std::shared_ptr<Time24Interval> other) {
-	return interval == other;
+bool WatchIntervalImpl::startsAt(const Time24 &t) const {
+	return start.compareTo(t) == 0;
 }
 
-void WatchIntervalImpl::advanceTime(std::shared_ptr<Time24> now) {
-	if (interval != nullptr) {
-		if (interval->insideInterval(*now) && !active) {
-			nrActivations = 0;
-			active = true;
-		}
-		if (!interval->insideInterval(*now) && active) {
-			raiseAlarmIfNeeded();
-			nrActivations = 0;
-			active = false;
-		}
-	}
+bool WatchIntervalImpl::endsAt(const Time24 &t) const {
+	return end.compareTo(t) == 0;
 }
-void WatchIntervalImpl::activityDetected(std::shared_ptr<Time24> now) {
-	if (interval != nullptr) {
-		if (interval->insideInterval(*now)) {
+
+const Time24& WatchIntervalImpl::getStart() const {
+	return start;
+}
+
+const Time24& WatchIntervalImpl::getEnd() const {
+	return end;
+}
+
+bool WatchIntervalImpl::matches(std::shared_ptr<Time24> start,
+		std::shared_ptr<Time24> end) const {
+	auto startMatches = this->start.compareTo(*start) == 0;
+	auto endMatches = this->end.compareTo(*end) == 0;
+	return startMatches && endMatches;
+}
+
+IntervalState WatchIntervalImpl::getState() const {
+	return state;
+}
+
+void WatchIntervalImpl::reset() {
+	nrActivations = 0;
+	state = IntervalState::PASSIVE;
+}
+
+bool WatchIntervalImpl::insideInterval(const Time24 &now) const {
+	if (start.compareTo(end) < 0)
+		return insideStartAndEnd(now);
+	else
+		return insideEndAndStart(now);
+}
+
+bool WatchIntervalImpl::insideStartAndEnd(const Time24 &now) const {
+	if ((now.compareTo(start) >= 0) || (end.compareTo(now) <= 0))
+		return true;
+	else
+		return false;
+}
+
+bool WatchIntervalImpl::insideEndAndStart(const Time24 &now) const {
+	if ((now.compareTo(start) >= 0) || (now.compareTo(end) <= 0))
+		return true;
+	else
+		return false;
+}
+
+void WatchIntervalImpl::progress(std::shared_ptr<Time24> now,
+		int nrActivations) {
+	if (state != IntervalState::HELPNEEDED) {
+		if (insideInterval(*now)) {
 			nrActivations++;
 		}
-	}
-}
-
-void WatchIntervalImpl::raiseAlarmIfNeeded() {
-	if (nrActivations < nrActivationToBeOk) {
-		ah->raiseAlarm();
+		if (insideInterval(*now) && state == IntervalState::PASSIVE) {
+			nrActivations = 0;
+			state = IntervalState::ACTIVE;
+		}
+		if (!insideInterval(*now) && state == IntervalState::ACTIVE) {
+			if (nrActivations < nrActivationToBeOk) {
+				state = IntervalState::HELPNEEDED;
+			} else {
+				state = IntervalState::PASSIVE;
+			}
+			nrActivations = 0;
+		}
 	}
 }
 

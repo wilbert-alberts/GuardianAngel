@@ -9,12 +9,13 @@
 #ifndef CLOCK_HPP_
 #define CLOCK_HPP_
 
+#include <ITimeProvider.hpp>
 #include <memory>
 
 class Time24;
 class GSM;
 
-class Clock {
+class Clock : public ITimeProvider {
 public:
     virtual ~Clock() {};
     virtual std::shared_ptr<Time24> getTime() const = 0;

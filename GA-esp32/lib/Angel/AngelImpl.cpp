@@ -5,68 +5,74 @@
  *      Author: wilbert
  */
 
-#include <memory>
-#include <vector>
-#include <string>
+#include <Angel.hpp>
+#include <stddef.h>
+#include <Time24.hpp>
+#include <Time24Factory.hpp>
+#include <WatchInterval.hpp>
+#include <WatchIntervalFactory.hpp>
 #include <algorithm>
+#include <iterator>
+#include <memory>
+#include <string>
+#include <vector>
 
-#include "Angel.hpp"
-#include "Time24Interval.hpp"
-#include "Time24Factory.hpp"
-#include "Time24IntervalFactory.hpp"
-#include "WatchDog.hpp"
-#include "ActivityDetector.hpp"
-#include "GSM.hpp"
-
-#include "AlarmHandler.hpp"
-
-class AngelImpl: public Angel, public ActivityListener, public AlarmHandler {
+class AngelImpl: public Angel {
 public:
-	AngelImpl(const std::string &phoneNr, std::shared_ptr<WatchDog>,
-			std::shared_ptr<ActivityDetector> hr, std::shared_ptr<GSM> gsm);
+	AngelImpl(const std::string &phoneNr);
 
 	virtual ~AngelImpl();
 
 	virtual const std::string& getPhoneNr() const;
+
+    virtual void reset();
+    virtual void progress(std::shared_ptr<Time24> now, int nrActiviations);
+    virtual bool helpNeeded();
+
 	virtual void addInterval(const std::string &start, const std::string &end);
 	virtual void delInterval(const std::string &start, const std::string &end);
 	virtual int getNrIntervals() const;
-	virtual std::shared_ptr<Time24Interval> getInterval(size_t idx) const;
-	virtual void activityDetected();
-	virtual void raiseAlarm();
+	virtual std::shared_ptr<WatchInterval> getInterval(size_t idx) const;
 
 private:
 	std::string phoneNr;
-	std::shared_ptr<WatchDog> wd;
-	std::shared_ptr<GSM> gsm;
-	std::shared_ptr<ActivityDetector> hr;
-	std::vector<std::shared_ptr<Time24Interval>> intervals;
+	std::vector<std::shared_ptr<WatchInterval>> intervals;
 };
 
 namespace AngelFactory {
-std::shared_ptr<Angel> create(const std::string &phoneNr,
-		std::shared_ptr<WatchDog> wd, std::shared_ptr<ActivityDetector> hr,
-		std::shared_ptr<GSM> gsm) {
-	return std::shared_ptr<Angel>(new AngelImpl(phoneNr, wd, hr, gsm));
+std::shared_ptr<Angel> create(const std::string &phoneNr) {
+	return std::shared_ptr<Angel>(new AngelImpl(phoneNr));
 }
 }
 
-AngelImpl::AngelImpl(const std::string &pnr, std::shared_ptr<WatchDog> _wd,
-		std::shared_ptr<ActivityDetector> _hr, std::shared_ptr<GSM> _gsm) :
-		phoneNr(pnr), wd(_wd), gsm(_gsm) {
-	hr->addListener(std::shared_ptr<ActivityListener>(this));
+AngelImpl::AngelImpl(const std::string &pnr)
+: phoneNr(pnr)
+{
 }
 
 AngelImpl::~AngelImpl() {
-	hr->delListener(std::shared_ptr<ActivityListener>(this));
-	std::for_each(intervals.begin(), intervals.end(),
-			[&](std::shared_ptr<Time24Interval> i) {
-				wd->delInterval(std::shared_ptr<AlarmHandler>(this), i);
-			});
 }
 
 const std::string& AngelImpl::getPhoneNr() const {
 	return phoneNr;
+}
+
+void AngelImpl::reset() {
+	std::for_each(intervals.begin(), intervals.end(), [](auto i){
+		i->reset();
+	});
+}
+
+void AngelImpl::progress(std::shared_ptr<Time24> now, int nrActivations) {
+	std::for_each(intervals.begin(), intervals.end(), [&](auto i){
+		i->progress(now, nrActivations);
+	});
+}
+
+bool AngelImpl::helpNeeded() {
+	return std::any_of(intervals.begin(), intervals.end(), [&](auto i){
+		return i->getState() == IntervalState::HELPNEEDED;
+	});
 }
 
 void AngelImpl::addInterval(const std::string &start, const std::string &end) {
@@ -79,11 +85,9 @@ void AngelImpl::addInterval(const std::string &start, const std::string &end) {
 	if (endTime.get() == nullptr)
 		return;
 
-	auto t24iv = Time24IntervalFactory::create(*startTime, *endTime);
+	auto newInterval = WatchIntervalFactory::create(*startTime, *endTime);
 
-	intervals.push_back(t24iv);
-
-	wd->addInterval(std::shared_ptr<AlarmHandler>(this), t24iv);
+	intervals.push_back(newInterval);
 }
 
 void AngelImpl::delInterval(const std::string &start, const std::string &end) {
@@ -96,36 +100,24 @@ void AngelImpl::delInterval(const std::string &start, const std::string &end) {
 		return;
 
 	auto newEnd = std::remove_if(intervals.begin(), intervals.end(),
-			[&](std::shared_ptr<Time24Interval> iv) {
-				return iv->startsAt(*startTime) && iv->endsAt(*endTime);
+			[&](std::shared_ptr<WatchInterval> iv) {
+				return iv->matches(startTime, endTime);
 			});
 	if (newEnd != intervals.end()) {
 		intervals.erase(newEnd, intervals.end());
 		return;
 	}
-	newEnd = std::remove_if(intervals.begin(), intervals.end(),
-			[&](std::shared_ptr<Time24Interval> iv) {
-				return iv->startsAt(*startTime);
-			});
-	intervals.erase(newEnd, intervals.end());
 }
 
 int AngelImpl::getNrIntervals() const {
 	return intervals.size();
 }
 
-std::shared_ptr<Time24Interval> AngelImpl::getInterval(size_t idx) const {
+std::shared_ptr<WatchInterval> AngelImpl::getInterval(size_t idx) const {
 	if (idx < intervals.size())
 		return intervals[idx];
 	else
 		return nullptr;
 }
 
-void AngelImpl::activityDetected() {
-	raiseAlarm();
-}
-
-void AngelImpl::raiseAlarm() {
-
-}
 

@@ -5,23 +5,17 @@
  *      Author: wilbert
  */
 
+#include <Clock.hpp>
+#include <GSM.hpp>
+#include <PeriodicTask.hpp>
+#include <Time24.hpp>
+#include <Time24Factory.hpp>
+#include <iostream>
 #include <memory>
-
-#include "platform.hpp"
-
-#include "Clock.hpp"
-#include "ClockFactory.hpp"
-
-#include "ActiveTask.hpp"
-#include "PeriodicTask.hpp"
-
-#include "Time24Factory.hpp"
-#include "Time24.hpp"
-
-#include "GSM.hpp"
+#include <string>
 
 class ClockImpl: public Clock, public PeriodicTask {
-	const int ALIGN_WITH_GSM_PERIOD_IN_SECS = (60*30); // Every 30 mins
+	const int ALIGN_WITH_GSM_PERIOD_IN_SECS = (60 * 30); // Every 30 mins
 	const int CLOCK_PERIOD_IN_SECS = 1;
 
 public:
@@ -40,10 +34,8 @@ private:
 };
 
 ClockImpl::ClockImpl() :
-		PeriodicTask("Clock", CLOCK_PERIOD_IN_SECS * 1000, 4000)
-, now(Time24Factory::create(20, 0, 55))
-, gsm(nullptr)
-, updateDue(0) {
+		PeriodicTask("Clock", CLOCK_PERIOD_IN_SECS * 1000, 4000), now(
+				Time24Factory::create(20, 0, 55)), gsm(nullptr), updateDue(0) {
 }
 
 ClockImpl::~ClockImpl() {
@@ -80,7 +72,7 @@ void ClockImpl::updateNow() {
 		// Check whether update is due
 		if (updateDue == 0) {
 			now = gsm->getTime();
-			updateDue = ALIGN_WITH_GSM_PERIOD_IN_SECS/CLOCK_PERIOD_IN_SECS;
+			updateDue = ALIGN_WITH_GSM_PERIOD_IN_SECS / CLOCK_PERIOD_IN_SECS;
 		} else
 			updateDue--;
 	}

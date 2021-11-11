@@ -1,0 +1,107 @@
+@startuml
+
+class AngelMgr <<Static>> <<PeriodicTask>> {
+	void resetAngels()
+	
+}
+
+class Angel {
+	void resetState()
+	void progress(Time24 now, int nrActivations)
+	string getPhoneNr()
+	boolean getHelpNeeded()	
+	void addInterval(Time24 start, Time24 end)
+	void delInterval(Time24 start, Time24 end)
+}
+
+enum IntervalState {
+	PASSIVE
+	ACTIVE
+	HELPNEEDED
+}
+
+class WatchInterval {
+	void progress(Time24 now, int nrActivations)
+	void resetState()
+	IntervalState getState()
+
+	bool insiderInterval(Time24 now)
+	bool startsAt(Time24 now)
+	bool endsAt(Time24 now)
+
+	Time24 getStart()
+	Time24 getEnd()
+
+	Time24 start
+	Time24 end
+}
+
+interface IAlarmProcessor {
+	void sendAlarm(string phoneNr)
+}
+
+class AlarmStation <<Static>>
+
+AlarmStation --|> IAlarmProcessor
+AlarmStation --> MessageSender: msgSender
+
+AngelMgr *--> Angel: angels
+AngelMgr -->ActivityDetector: activityDetector
+AngelMgr -->Button: helpButton
+AngelMgr -->TimeProvider: tp
+Angel *--> WatchInterval: intervals
+AngelMgr --> IAlarmProcessor: alarmProcessor
+
+class GSM <<Static>> <<PeriodicTask>>{
+	void sendMessage(string phoneNr, string msg);
+	vector<MessageID> getMessageIDs();
+	Message getMessage(MessageID id);
+	void deleteMessage(messageID id);
+	Time24 getTime();	
+}
+
+class Clock <<Static>> <<PeriodicTask>>{
+	Time24 getTime();
+}
+
+Clock --> TimeProvider: todp
+Clock --|> TimeProvider
+
+class ActivityDetector <<Static>> <<PeriodicTask>>{
+	void clearActivity()
+	int  getNrActivations()
+}
+
+class Button <<Static>> <<PeriodicTask>>{
+	addListener(BtnListener h);
+	delListener(BtnListener h);	
+}
+
+interface BtnListener {
+	void btnPressed();
+}
+
+Button --> BtnListener: listeners
+AngelMgr --|> BtnListener
+
+
+
+interface TimeProvider {
+	Time24 getTime()
+}
+
+interface MessageProvider {
+vector<MessageID> getMessageIDs();
+Message getMessage(MessageID id);
+void deleteMessage(MessageID id);
+}
+
+interface MessageSender {
+	void sendMessage(string phoneNr, string msg)
+}
+
+GSM --|> TimeProvider
+GSM --|> MessageSender
+GSM --|> MessageProvider
+
+@enduml

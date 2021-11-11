@@ -13,7 +13,7 @@
 
 class Angel;
 class Config;
-class Time24Interval;
+class WatchInterval;
 
 class SaveableAngel {
 public:
@@ -28,7 +28,7 @@ private:
 
 	void savePhoneNr();
 	void saveIntervals();
-	void saveInterval(int idx, std::shared_ptr<Time24Interval> iv);
+	void saveInterval(int idx, std::shared_ptr<WatchInterval> iv);
 
 	void saveStr(const std::string& key, const std::string& value);
 

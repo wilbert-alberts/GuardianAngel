@@ -18,10 +18,7 @@ class GSM;
 namespace AngelFactory {
 
 std::shared_ptr<Angel> create(
-		const std::string& phoneNr,
-		std::shared_ptr<WatchDog> wd,
-		std::shared_ptr<ActivityDetector> hr,
-		std::shared_ptr<GSM> gsm);
+		const std::string& phoneNr);
 }
 
 
