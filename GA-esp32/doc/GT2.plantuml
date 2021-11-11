@@ -24,14 +24,11 @@ class WatchInterval {
 	void progress(Time24 now, int nrActivations)
 	void resetState()
 	IntervalState getState()
-
 	bool insiderInterval(Time24 now)
 	bool startsAt(Time24 now)
 	bool endsAt(Time24 now)
-
 	Time24 getStart()
 	Time24 getEnd()
-
 	Time24 start
 	Time24 end
 }

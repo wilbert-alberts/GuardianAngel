@@ -85,7 +85,7 @@ bool WatchIntervalImpl::insideInterval(const Time24 &now) const {
 }
 
 bool WatchIntervalImpl::insideStartAndEnd(const Time24 &now) const {
-	if ((now.compareTo(start) >= 0) || (end.compareTo(now) <= 0))
+	if ((now.compareTo(start) >= 0) && (now.compareTo(end) <= 0))
 		return true;
 	else
 		return false;
@@ -99,13 +99,13 @@ bool WatchIntervalImpl::insideEndAndStart(const Time24 &now) const {
 }
 
 void WatchIntervalImpl::progress(std::shared_ptr<Time24> now,
-		int nrActivations) {
+		int activity) {
 	if (state != IntervalState::HELPNEEDED) {
 		if (insideInterval(*now)) {
-			nrActivations++;
+			nrActivations+=activity;
 		}
 		if (insideInterval(*now) && state == IntervalState::PASSIVE) {
-			nrActivations = 0;
+			nrActivations = activity;
 			state = IntervalState::ACTIVE;
 		}
 		if (!insideInterval(*now) && state == IntervalState::ACTIVE) {
@@ -117,5 +117,5 @@ void WatchIntervalImpl::progress(std::shared_ptr<Time24> now,
 			nrActivations = 0;
 		}
 	}
-}
+ }
 
