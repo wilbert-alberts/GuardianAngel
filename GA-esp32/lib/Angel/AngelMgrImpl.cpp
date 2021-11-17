@@ -119,7 +119,9 @@ void AngelMgrImpl::processAngels() {
 
 	// Tell angels that have not yet been alarmed
 	std::for_each(angels.begin(), angels.end(), [&](auto a) {
-		a->progress(now, nrActivations);
+		a->timeProgress(now);
+		if (nrActivations>0)
+			a->activityDetected();
 	});
 
 	// Send alarm to angels when needed

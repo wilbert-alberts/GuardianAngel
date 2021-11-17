@@ -20,9 +20,9 @@ TEST(WatchIntervalImpl, InsideWorkingTimeInterval) {
 	auto end = Time24Factory::create(16,30,0);
 	auto lunch = Time24Factory::create(11,30,0);
 
-	auto workingTime = WatchIntervalFactory::create(*begin, *end);
+	auto workingTime = WatchIntervalFactory::create(begin, end);
 
-	ASSERT_TRUE(workingTime->insideInterval(*lunch));
+	ASSERT_TRUE(workingTime->insideInterval(lunch));
 }
 
 TEST(WatchIntervalImpl, BeforeWorkingTimeInterval) {
@@ -30,9 +30,9 @@ TEST(WatchIntervalImpl, BeforeWorkingTimeInterval) {
 	auto end = Time24Factory::create(16,30,0);
 	auto wakeup = Time24Factory::create(7,0,0);
 
-	auto workingTime = WatchIntervalFactory::create(*begin, *end);
+	auto workingTime = WatchIntervalFactory::create(begin, end);
 
-	ASSERT_FALSE(workingTime->insideInterval(*wakeup));
+	ASSERT_FALSE(workingTime->insideInterval(wakeup));
 }
 
 TEST(WatchIntervalImpl, AfterWorkingTimeInterval) {
@@ -40,9 +40,9 @@ TEST(WatchIntervalImpl, AfterWorkingTimeInterval) {
 	auto end = Time24Factory::create(16,30,0);
 	auto bedTime = Time24Factory::create(7,0,0);
 
-	auto workingTime = WatchIntervalFactory::create(*begin, *end);
+	auto workingTime = WatchIntervalFactory::create(begin, end);
 
-	ASSERT_FALSE(workingTime->insideInterval(*bedTime));
+	ASSERT_FALSE(workingTime->insideInterval(bedTime));
 }
 
 
@@ -51,9 +51,9 @@ TEST(WatchIntervalImpl, InsidePartyTimeInterval) {
 	auto end = Time24Factory::create(1,30,0);
 	auto midnight= Time24Factory::create(0,0,0);
 
-	auto partyTime = WatchIntervalFactory::create(*begin, *end);
+	auto partyTime = WatchIntervalFactory::create(begin, end);
 
-	ASSERT_TRUE(partyTime->insideInterval(*midnight));
+	ASSERT_TRUE(partyTime->insideInterval(midnight));
 }
 
 TEST(WatchIntervalImpl, TooEarlyToParty) {
@@ -61,9 +61,9 @@ TEST(WatchIntervalImpl, TooEarlyToParty) {
 	auto end = Time24Factory::create(1,30,0);
 	auto noon= Time24Factory::create(18,0,0);
 
-	auto partyTime = WatchIntervalFactory::create(*begin, *end);
+	auto partyTime = WatchIntervalFactory::create(begin, end);
 
-	ASSERT_FALSE(partyTime->insideInterval(*noon));
+	ASSERT_FALSE(partyTime->insideInterval(noon));
 }
 
 TEST(WatchIntervalImpl, PartyIsOver) {
@@ -71,9 +71,9 @@ TEST(WatchIntervalImpl, PartyIsOver) {
 	auto end = Time24Factory::create(1,30,0);
 	auto justPassed= Time24Factory::create(1,40,0);
 
-	auto partyTime = WatchIntervalFactory::create(*begin, *end);
+	auto partyTime = WatchIntervalFactory::create(begin, end);
 
-	ASSERT_FALSE(partyTime->insideInterval(*justPassed));
+	ASSERT_FALSE(partyTime->insideInterval(justPassed));
 }
 
 

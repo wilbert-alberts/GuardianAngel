@@ -19,16 +19,17 @@ class WatchInterval
 public:
     virtual ~WatchInterval() {}
 
-	virtual bool insideInterval(const Time24 &now) const = 0;
-	virtual bool startsAt(const Time24& t) const = 0;
-	virtual bool endsAt(const Time24& t) const = 0;
+	virtual bool insideInterval(std::shared_ptr<Time24> now) const = 0;
+	virtual bool startsAt(std::shared_ptr<Time24> now) const = 0;
+	virtual bool endsAt(std::shared_ptr<Time24> now) const = 0;
 
-	virtual const Time24& getStart() const = 0;
-	virtual const Time24& getEnd() const = 0;
+	virtual std::shared_ptr<const Time24> getStart() const = 0;
+	virtual std::shared_ptr<const Time24> getEnd() const = 0;
 
     virtual bool matches(std::shared_ptr<Time24> start, std::shared_ptr<Time24> end) const = 0;
 
-    virtual void progress(std::shared_ptr<Time24>  now, int nrActivations) = 0;
+    virtual void activityDetected(int nrActivations=1) = 0;
+    virtual void timeProgress(std::shared_ptr<Time24> now) = 0;
 
     virtual IntervalState getState() const = 0;
     virtual void reset() = 0;

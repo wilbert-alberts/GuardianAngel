@@ -10,7 +10,7 @@ class WatchInterval;
 
 namespace WatchIntervalFactory {
 
-std::shared_ptr<WatchInterval> create(const Time24 &start, const Time24 &end);
+std::shared_ptr<WatchInterval> create(std::shared_ptr<Time24> start, std::shared_ptr<Time24> end);
 
 }
 

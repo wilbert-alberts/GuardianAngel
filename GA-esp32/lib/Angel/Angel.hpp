@@ -14,7 +14,8 @@ public:
 
     virtual void reset() = 0;
     virtual const std::string& getPhoneNr() const = 0;
-    virtual void progress(std::shared_ptr<Time24> now, int nrActiviations) = 0;
+    virtual void timeProgress(std::shared_ptr<Time24> now) = 0;
+    virtual void activityDetected() = 0;
     virtual bool helpNeeded() = 0;
 
     virtual void addInterval(const std::string& start, const std::string& end) = 0;

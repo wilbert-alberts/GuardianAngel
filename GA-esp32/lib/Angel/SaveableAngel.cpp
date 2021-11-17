@@ -47,9 +47,9 @@ void SaveableAngel::saveIntervals() {
 void SaveableAngel::saveInterval(int idx, std::shared_ptr<WatchInterval> iv) {
 	std::stringstream startKeyStream;
 	startKeyStream << "interval_" << idx << "_" << "start";
-	saveStr(startKeyStream.str(),  iv->getStart().toString());
+	saveStr(startKeyStream.str(),  iv->getStart()->toString());
 
 	std::stringstream endKeyStream;
 	endKeyStream << "interval_" << idx << "_" << "end";
-	saveStr(endKeyStream.str(),  iv->getEnd().toString());
+	saveStr(endKeyStream.str(),  iv->getEnd()->toString());
 }

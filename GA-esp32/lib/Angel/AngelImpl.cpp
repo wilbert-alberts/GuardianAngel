@@ -16,6 +16,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <iostream>
 
 class AngelImpl: public Angel {
 public:
@@ -26,7 +27,8 @@ public:
 	virtual const std::string& getPhoneNr() const;
 
     virtual void reset();
-    virtual void progress(std::shared_ptr<Time24> now, int nrActiviations);
+    virtual void timeProgress(std::shared_ptr<Time24> now);
+    virtual void activityDetected();
     virtual bool helpNeeded();
 
 	virtual void addInterval(const std::string &start, const std::string &end);
@@ -63,9 +65,15 @@ void AngelImpl::reset() {
 	});
 }
 
-void AngelImpl::progress(std::shared_ptr<Time24> now, int nrActivations) {
+void AngelImpl::timeProgress(std::shared_ptr<Time24> now) {
 	std::for_each(intervals.begin(), intervals.end(), [&](auto i){
-		i->progress(now, nrActivations);
+		i->timeProgress(now);
+	});
+}
+
+void AngelImpl::activityDetected() {
+	std::for_each(intervals.begin(), intervals.end(), [&](auto i){
+		i->activityDetected();
 	});
 }
 
@@ -85,7 +93,7 @@ void AngelImpl::addInterval(const std::string &start, const std::string &end) {
 	if (endTime.get() == nullptr)
 		return;
 
-	auto newInterval = WatchIntervalFactory::create(*startTime, *endTime);
+	auto newInterval = WatchIntervalFactory::create(startTime, endTime);
 
 	intervals.push_back(newInterval);
 }
@@ -101,11 +109,11 @@ void AngelImpl::delInterval(const std::string &start, const std::string &end) {
 
 	auto newEnd = std::remove_if(intervals.begin(), intervals.end(),
 			[&](std::shared_ptr<WatchInterval> iv) {
-				return iv->matches(startTime, endTime);
+				auto result = iv->matches(startTime, endTime);
+				return result;
 			});
 	if (newEnd != intervals.end()) {
 		intervals.erase(newEnd, intervals.end());
-		return;
 	}
 }
 
