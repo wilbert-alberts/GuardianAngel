@@ -10,6 +10,7 @@
 
 #include <memory>
 
+class IMessageProvider;
 class IButton;
 class IMessageProcessor;
 class IActivityDetector;
@@ -23,7 +24,7 @@ public:
 
 	virtual void resetAngels() = 0;
 	virtual void setHelpButton(std::shared_ptr<IButton> helpButton) = 0;
-	virtual void setMessageProvider(std::shared_ptr<IMessageProcessor> messageProvider) = 0;
+	virtual void setMessageProvider(std::shared_ptr<IMessageProvider> messageProvider) = 0;
 	virtual void setActivityDetector(std::shared_ptr<IActivityDetector> activityDetector) = 0;
 	virtual void setAlarmProcessor(std::shared_ptr<IAlarmProcessor> alarmProcessor) = 0;
 	virtual void setTimeProvider(std::shared_ptr<ITimeProvider> timeProvider) = 0;

@@ -27,4 +27,8 @@
 
 #endif
 
+
+#define TIME24_NORMAL // TIME24_DEBUG
+
+
 #endif /* INCLUDE_PLATFORM_HPP_ */

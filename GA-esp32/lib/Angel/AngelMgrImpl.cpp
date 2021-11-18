@@ -5,62 +5,20 @@
  *      Author: wilbert
  */
 
-#include "IBtnListener.hpp"
-#include "Angel.hpp"
-#include "AngelFactory.hpp"
-#include "AngelMgr.hpp"
-#include "IActivityDetector.hpp"
-#include "IAlarmProcessor.hpp"
-#include "IButton.hpp"
-#include "IMessage.hpp"
-#include "IMessageProvider.hpp"
-#include "ITimeProvider.hpp"
-#include "PeriodicTask.hpp"
-#include "Time24.hpp"
-
+#include <Angel.hpp>
+#include <AngelFactory.hpp>
+#include <AngelMgrImpl.hpp>
+#include <IActivityDetector.hpp>
+#include <IAlarmProcessor.hpp>
+#include <IButton.hpp>
+#include <IMessage.hpp>
+#include <IMessageProvider.hpp>
+#include <ITimeProvider.hpp>
+#include <Time24.hpp>
 #include <algorithm>
 #include <iterator>
-#include <memory>
-#include <string>
-#include <vector>
 
-class AngelMgrImpl: public AngelMgr, public IBtnListener, public PeriodicTask {
-public:
-	virtual ~AngelMgrImpl() {
-	}
 
-	virtual void resetAngels();
-	virtual void setHelpButton(std::shared_ptr<IButton> helpButton);
-		virtual void btnPressed();
-	virtual void setMessageProvider(
-			std::shared_ptr<IMessageProvider> messageProvider);
-	virtual void setActivityDetector(
-			std::shared_ptr<IActivityDetector> activityDetector);
-	virtual void setAlarmProcessor(
-			std::shared_ptr<IAlarmProcessor> alarmProcessor);
-	virtual void setTimeProvider(std::shared_ptr<ITimeProvider> timeProvider);
-	virtual void tick();
-
-private:
-	std::vector<std::shared_ptr<Angel>> angels;
-	std::vector<std::shared_ptr<Angel>> alarmedAngels;
-
-	std::shared_ptr<IAlarmProcessor> alarmProcessor;
-	std::shared_ptr<IMessageProvider> messageProvider;
-	std::shared_ptr<ITimeProvider> clock;
-	std::shared_ptr<IActivityDetector> activityDetector;
-
-	void processAngels();
-	void processMessages();
-	void processMessage(std::shared_ptr<IMessage> msg);
-	void subscribeAngel(const std::string &phonenr, const std::string &start,
-			const std::string &end, bool save);
-	void unsubscribeAngel(const std::string &phonenr, const std::string &start,
-			const std::string &end, bool save);
-	std::shared_ptr<Angel> findAngel(const std::string &phoneNr);
-	std::shared_ptr<Angel> addAngel(const std::string &phoneNr);
-	void delAngel(const std::string &phoneNr);
-};
 
 void AngelMgrImpl::resetAngels() {
 	std::for_each(alarmedAngels.begin(), alarmedAngels.end(), [&](auto a) {
@@ -105,7 +63,7 @@ inline void AngelMgrImpl::setTimeProvider(
 	clock = timeProvider;
 }
 
-void AngelMgrImpl::tick() {
+void AngelMgrImpl::doTick() {
 	processAngels();
 	processMessages();
 }

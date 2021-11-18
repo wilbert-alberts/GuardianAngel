@@ -5,64 +5,9 @@
  *      Author: wilbert
  */
 
-#include <stdexcept>
-#include <memory>
-#include <string>
+#include <Time24Impl.hpp>
 #include <sstream>
-
-#include "Time24.hpp"
-
-class Time24Impl: public Time24 {
-public:
-	Time24Impl(int h, int m, int s);
-	virtual ~Time24Impl();
-
-	virtual int getHours() const;
-	virtual int getMinutes() const;
-	virtual int getSeconds() const;
-
-	virtual void add(int h, int m, int s);
-	virtual void add(const Time24 &other);
-	virtual void addHours(int h);
-	virtual void addMinutes(int m);
-	virtual void addSeconds(int s);
-
-	virtual int compareTo(const Time24 &other) const;
-
-	virtual std::string toString() const;
-
-private:
-	int hours;
-	int minutes;
-	int seconds;
-
-	void verifyIntegrity();
-	void verifyIntegrity(int h, int m, int s);
-	void verifyNatural(int value);
-	void verifyNaturalMax(int value, int bound);
-};
-
-namespace Time24Factory {
-std::shared_ptr<Time24> create(int h, int m, int s) {
-	return std::shared_ptr<Time24>(new Time24Impl(h, m, s));
-}
-
-std::shared_ptr<Time24> create(std::string hhmm) {
-	std::string hoursStr = hhmm.substr(0, hhmm.find(":"));
-	std::string minsStr = hhmm.substr(hhmm.find(":") + 1);
-	try {
-		int hours = stoi(hoursStr);
-		int mins = stoi(minsStr);
-
-		if (hours >= 0 && hours < 24 && mins >= 0 && mins < 60)
-			return create(hours, mins, 0);
-		else
-			return std::shared_ptr<Time24>(nullptr);
-	} catch (...) {
-		return std::shared_ptr<Time24>(nullptr);
-	}
-}
-}
+#include <stdexcept>
 
 Time24Impl::Time24Impl(int h, int m, int s) {
 	hours = h;

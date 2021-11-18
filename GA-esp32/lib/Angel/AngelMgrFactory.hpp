@@ -14,6 +14,7 @@ class AngelMgr;
 
 namespace AngelMgrFactory {
 std::shared_ptr<AngelMgr> create();
+std::shared_ptr<AngelMgr> createTask();
 
 }
 

@@ -113,6 +113,9 @@ TEST(Angel, HelpNeeded2) {
 	angel->timeProgress(Time24Factory::create("19:30"));
 	angel->activityDetected();
 	ASSERT_TRUE(angel->helpNeeded());
+
+	angel->reset();
+	ASSERT_FALSE(angel->helpNeeded());
 }
 
 
