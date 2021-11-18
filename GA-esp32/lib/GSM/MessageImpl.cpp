@@ -5,11 +5,11 @@
  *      Author: wilbert
  */
 
-#include "Message.hpp"
+#include "IMessage.hpp"
 
 #include <regex>
 
-class MessageImpl: public Message {
+class MessageImpl: public IMessage {
 public:
 	MessageImpl(const MessageID msgId, const std::string &sender,
 			const std::string &body);
@@ -39,8 +39,8 @@ private:
 const std::regex MessageImpl::messageRx(MessageImpl::initMessageRx());
 
 namespace MessageFactory {
-std::shared_ptr<Message> createMessage(const MessageID id, const std::string sender, const std::string body) {
-	return std::shared_ptr<Message>(new MessageImpl(id, sender, body));
+std::shared_ptr<IMessage> createMessage(const MessageID id, const std::string sender, const std::string body) {
+	return std::shared_ptr<IMessage>(new MessageImpl(id, sender, body));
 }
 
 }

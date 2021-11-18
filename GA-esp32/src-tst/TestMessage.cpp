@@ -8,7 +8,7 @@
 #include "gtest/gtest.h"
 
 #include "MessageFactory.hpp"
-#include "Message.hpp"
+#include "IMessage.hpp"
 
 TEST(TestMessage, OnlySubscribe) {
 	auto msg = MessageFactory::createMessage(1, "me", "subscribe");

@@ -11,10 +11,10 @@
 #include <memory>
 #include <string>
 
-#include "Message.hpp"
+#include "IMessage.hpp"
 
 namespace MessageFactory {
-	std::shared_ptr<Message> createMessage(const MessageID id, const std::string sender, const std::string body);
+	std::shared_ptr<IMessage> createMessage(const MessageID id, const std::string sender, const std::string body);
 }
 
 
