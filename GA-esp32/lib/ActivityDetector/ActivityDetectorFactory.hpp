@@ -9,14 +9,13 @@
 #define LIB_ACTIVITYDETECTOR_ACTIVITYDETECTORFACTORY_HPP_
 
 #include <memory>
-
 #include "ValueProvider.hpp"
-#include "ActivityDetector.hpp"
+
+class IActivityDetector;
 
 namespace ActivityDetectorFactory {
-	std::shared_ptr<ActivityDetector> create(ValueProvider vp);
+	std::shared_ptr<IActivityDetector> create(ValueProvider vp);
+	std::shared_ptr<IActivityDetector> createTask(ValueProvider vp);
 }
-
-
 
 #endif /* LIB_ACTIVITYDETECTOR_ACTIVITYDETECTORFACTORY_HPP_ */

@@ -5,55 +5,40 @@
  *      Author: wilbert
  */
 
-#include <Clock.hpp>
+#include "DbgClock.hpp"
+
+#include <Time24.hpp>
 #include <Time24Factory.hpp>
 #include <algorithm>
 #include <iterator>
-#include <memory>
-#include <string>
-#include <vector>
 
-class TimeTable {
-public:
-	void setTimes(std::vector<std::string> times);
-	std::shared_ptr<Time24> popTime();
 
-private:
-	std::vector<std::shared_ptr<Time24>> times;
-};
+void DbgClock::setTimes(std::vector<std::string> _times) {
 
-void TimeTable::setTimes(std::vector<std::string> _times) {
-	std::transform(_times.begin(), _times.end(), times.begin(), [](auto s) {
-		return Time24Factory::create(s);
+	std::for_each(_times.begin(), _times.end(), [this](auto s) {
+		times.push_back(Time24Factory::create(s));
 	});
 }
-std::shared_ptr<Time24> TimeTable::popTime() {
+
+void DbgClock::pushTime(std::string time) {
+	times.push_back(Time24Factory::create(time));
+}
+
+
+std::shared_ptr<Time24> DbgClock::getTime() const {
 	if (times.size() > 0) {
-		auto r = *times.begin();
-		times.erase(times.begin());
-		return r;
+		return *times.begin();
 	} else {
 		return std::shared_ptr<Time24>(nullptr);
 	}
 }
 
-class DbgClock: public Clock {
-public:
-	virtual ~DbgClock() {
+void DbgClock::advanceTime() {
+	if (times.size() > 0) {
+		times.erase(times.begin());
 	}
-	;
-	void setTimes(std::vector<std::string> times);
-	virtual std::shared_ptr<Time24> getTime() const;
-	virtual void setGSM(std::shared_ptr<GSM> gsm) = 0;
-private:
-	TimeTable tt;
-};
-
-void DbgClock::setTimes(std::vector<std::string> times) {
-	tt.setTimes(times);
 }
 
-std::shared_ptr<Time24> DbgClock::getTime() const {
-	return ((TimeTable)tt).popTime();
-}
+void DbgClock::setGSM(std::shared_ptr<GSM> gsm) {
 
+}

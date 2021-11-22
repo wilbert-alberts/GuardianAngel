@@ -5,14 +5,16 @@
  *      Author: wilbert
  */
 
-#include <Config.hpp>
 #include <Angel.hpp>
+#include <strings.h>
 #include <SaveableAngel.hpp>
 #include <Time24.hpp>
 #include <WatchInterval.hpp>
+#include <IConfigProvider.hpp>
 #include <sstream>
 
-SaveableAngel::SaveableAngel(std::shared_ptr<Angel> a, std::shared_ptr<Config> _cfg, int idx) : index(idx), angel(a), cfg(_cfg){
+
+SaveableAngel::SaveableAngel(std::shared_ptr<Angel> a, std::shared_ptr<IConfigProvider> _cfg, int idx) : index(idx), angel(a), cfg(_cfg){
 
 }
 

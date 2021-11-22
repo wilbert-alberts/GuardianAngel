@@ -8,13 +8,14 @@
 #ifndef CONFIGFACTORY_HPP_
 #define CONFIGFACTORY_HPP_
 
-#include "Config.hpp"
 
 #include <memory>
 
+class IConfigProvider;
+
 namespace ConfigFactory {
 
-extern std::shared_ptr<Config> create();
+extern std::shared_ptr<IConfigProvider> create();
 
 }
 

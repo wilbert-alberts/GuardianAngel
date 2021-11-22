@@ -11,14 +11,16 @@
 #include <IActivityDetector.hpp>
 #include <IAlarmProcessor.hpp>
 #include <IButton.hpp>
+#include <IConfigProvider.hpp>
 #include <IMessage.hpp>
 #include <IMessageProvider.hpp>
 #include <ITimeProvider.hpp>
+#include <LoadableAngel.hpp>
+#include <stddef.h>
+#include <SaveableAngel.hpp>
 #include <Time24.hpp>
 #include <algorithm>
 #include <iterator>
-
-
 
 void AngelMgrImpl::resetAngels() {
 	std::for_each(alarmedAngels.begin(), alarmedAngels.end(), [&](auto a) {
@@ -48,19 +50,25 @@ void AngelMgrImpl::setMessageProvider(
 	messageProvider = provider;
 }
 
-inline void AngelMgrImpl::setActivityDetector(
+void AngelMgrImpl::setActivityDetector(
 		std::shared_ptr<IActivityDetector> detector) {
 	activityDetector = detector;
 }
 
-inline void AngelMgrImpl::setAlarmProcessor(
+void AngelMgrImpl::setAlarmProcessor(
 		std::shared_ptr<IAlarmProcessor> processor) {
 	alarmProcessor = processor;
 }
 
-inline void AngelMgrImpl::setTimeProvider(
+void AngelMgrImpl::setTimeProvider(
 		std::shared_ptr<ITimeProvider> timeProvider) {
 	clock = timeProvider;
+}
+
+void AngelMgrImpl::setConfigProvider(
+		std::shared_ptr<IConfigProvider> configMgr) {
+	configProvider = configMgr;
+	loadConfig();
 }
 
 void AngelMgrImpl::doTick() {
@@ -72,31 +80,32 @@ void AngelMgrImpl::processAngels() {
 	// Retrieve time
 	auto now = clock->getTime();
 	// Retrieve and clear activations
-	auto nrActivations = activityDetector->getNrActiviations();
+	auto nrActivations = activityDetector->getNrActivations();
 	activityDetector->clearActivity();
 
+	// Determine angels that have not yet been alarmed
+	std::vector<std::shared_ptr<Angel>> activeAngels;
+	std::copy_if(angels.begin(), angels.end(), activeAngels.begin(),
+			[&](auto a) {
+				return !(a->helpNeeded());
+			});
+
 	// Tell angels that have not yet been alarmed
-	std::for_each(angels.begin(), angels.end(), [&](auto a) {
+	std::for_each(activeAngels.begin(), activeAngels.end(), [&](auto a) {
 		a->timeProgress(now);
-		if (nrActivations>0)
+		if (nrActivations > 0)
 			a->activityDetected();
 	});
 
 	// Send alarm to angels when needed
-	std::for_each(angels.begin(), angels.end(), [&](auto a) {
-		if (a->helpNeeded()) {
-			if (alarmProcessor != nullptr) {
+	if (alarmProcessor != nullptr) {
+		std::for_each(activeAngels.begin(), activeAngels.end(), [&](auto a) {
+			if (a->helpNeeded()) {
 				alarmProcessor->sendAlarm(a->getPhoneNr());
+				alarmedAngels.push_back(a);
 			}
-			alarmedAngels.push_back(a);
-		}
-	});
-
-	// Move triggered angels to alarmedAngels
-	auto newEnd = std::remove_if(angels.begin(), angels.end(), [&](auto a) {
-		return a->helpNeeded();
-	});
-	angels.erase(newEnd, angels.end());
+		});
+	}
 }
 
 void AngelMgrImpl::processMessages() {
@@ -139,20 +148,22 @@ std::shared_ptr<Angel> AngelMgrImpl::findAngel(const std::string &phoneNr) {
 	return nullptr;
 }
 
-std::shared_ptr<Angel> AngelMgrImpl::addAngel(const std::string& phoneNr) {
+std::shared_ptr<Angel> AngelMgrImpl::addAngel(const std::string &phoneNr) {
 	auto newAngel = AngelFactory::create(phoneNr);
 	angels.push_back(newAngel);
 	return newAngel;
 }
 
-void AngelMgrImpl::delAngel(const std::string& phoneNr) {
-	auto newAngelEnd = std::remove_if(angels.begin(), angels.end(), [&](auto a){
-		return a->getPhoneNr() == phoneNr;
-	});
+void AngelMgrImpl::delAngel(const std::string &phoneNr) {
+	auto newAngelEnd = std::remove_if(angels.begin(), angels.end(),
+			[&](auto a) {
+				return a->getPhoneNr() == phoneNr;
+			});
 	angels.erase(newAngelEnd, angels.end());
-	auto newAlarmedAngelEnd = std::remove_if(alarmedAngels.begin(), alarmedAngels.end(), [&](auto a){
-		return a->getPhoneNr() == phoneNr;
-	});
+	auto newAlarmedAngelEnd = std::remove_if(alarmedAngels.begin(),
+			alarmedAngels.end(), [&](auto a) {
+				return a->getPhoneNr() == phoneNr;
+			});
 	alarmedAngels.erase(newAlarmedAngelEnd, alarmedAngels.end());
 }
 
@@ -168,8 +179,7 @@ void AngelMgrImpl::subscribeAngel(const std::string &phonenr,
 	}
 
 	angel->addInterval(start, end);
-//	if (save)
-//		saveConfig();
+	saveConfig();
 }
 
 void AngelMgrImpl::unsubscribeAngel(const std::string &phonenr,
@@ -182,6 +192,30 @@ void AngelMgrImpl::unsubscribeAngel(const std::string &phonenr,
 			delAngel(phonenr);
 		}
 	}
-//	if (save)
-//		saveConfig();
+	saveConfig();
+}
+
+void AngelMgrImpl::saveConfig() {
+	if (configProvider) {
+		configProvider->putProperty("nr_angels", std::to_string(angels.size()));
+		for (size_t i = 0; i < angels.size(); i++) {
+			auto sa = new SaveableAngel(angels[i], configProvider, i);
+			sa->save();
+		}
+	}
+}
+
+void AngelMgrImpl::loadConfig() {
+	if (configProvider) {
+		auto nrAngelsStr = configProvider->getProperty("nr_angels");
+		int nrAngels = 0;
+		if (nrAngelsStr != nullptr) {
+			nrAngels = std::stoi(*nrAngelsStr);
+		}
+		for (int i=0; i<nrAngels; i++) {
+			auto newLAngel = new LoadableAngel(configProvider, i);
+			auto newAngel = newLAngel->toAngel();
+			angels.push_back(newAngel);
+		}
+	}
 }

@@ -10,11 +10,11 @@
 
 #include <string>
 
-class Config
+class IConfigProvider
 {
 public:
-	Config() {};
-	virtual ~Config() {};
+	IConfigProvider() {};
+	virtual ~IConfigProvider() {};
     virtual void clear()=0;
     virtual void loadProperties()=0;
     virtual void saveProperties()=0;

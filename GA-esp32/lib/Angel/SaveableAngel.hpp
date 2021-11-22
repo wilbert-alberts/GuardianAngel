@@ -11,20 +11,21 @@
 #include <memory>
 #include <string>
 
+class IConfigProvider;
+
 class Angel;
-class Config;
 class WatchInterval;
 
 class SaveableAngel {
 public:
-	SaveableAngel(std::shared_ptr<Angel> a, std::shared_ptr<Config> cfg, int idx);
+	SaveableAngel(std::shared_ptr<Angel> a, std::shared_ptr<IConfigProvider> cfg, int idx);
 	void save();
 
 	virtual ~SaveableAngel();
 private:
 	int index;
 	std::shared_ptr<Angel> angel;
-	std::shared_ptr<Config> cfg;
+	std::shared_ptr<IConfigProvider> cfg;
 
 	void savePhoneNr();
 	void saveIntervals();

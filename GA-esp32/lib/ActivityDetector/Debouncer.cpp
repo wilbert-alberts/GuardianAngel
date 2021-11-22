@@ -6,7 +6,7 @@
  */
 
 #include "Debouncer.hpp"
-
+#include <iostream>
 Debouncer::Debouncer(int stabilizationPeriod, ValueProvider vp) :
 		valueProvider(vp), stabilizationPeriod(stabilizationPeriod) {
 	stableValue = valueProvider();
@@ -20,13 +20,14 @@ int Debouncer::getValue() const {
 
 bool Debouncer::tick() {
 	int v = valueProvider();
+//	std::cerr << "Debouncer tick: " << v << ", stableValue: " << stableValue << ", unstableValue: " << unstableValue << ", stablePeriods: " << stablePeriods << std::endl;
 	if (v != unstableValue) {
 		stablePeriods = 0;
 		unstableValue = v;
 		return false;
 	} else {
+		stablePeriods++;
 		if (stablePeriods < stabilizationPeriod) {
-			stablePeriods++;
 			return false;
 		} else {
 			if (stableValue != unstableValue) {

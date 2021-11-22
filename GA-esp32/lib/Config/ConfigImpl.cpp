@@ -5,44 +5,17 @@
  *      Author: wilbert
  */
 
-#include <Config.hpp>
+#include <ConfigImpl.hpp>
 #include <algorithm>
-#include <map>
 #include <memory>
-#include <regex>
-#include <string>
-#include <utility>
 #include <sstream>
+#include <utility>
 
-class ConfigImpl: public Config {
-	const std::regex keyValueRx = std::regex("\\s*([^=]+)\\s*=\\s*(.*+)\\s*");
-
-public:
-
-	virtual ~ConfigImpl() {
-	}
-	virtual void clear();
-	virtual void loadProperties();
-	virtual void saveProperties();
-
-	virtual void putProperty(const std::string &id, const std::string &value);
-
-	virtual const std::string* getProperty(const std::string &id);
-
-private:
-	typedef std::map<std::string, std::string> PropertyMap;
-
-	PropertyMap properties;
-
-	void propertiesToString(std::string &str);
-	void stringToProperties(const std::vector<std::string> &lines);
-
-};
 
 namespace ConfigFactory {
 
-std::shared_ptr<Config> create() {
-	return std::shared_ptr<Config>(new ConfigImpl());
+std::shared_ptr<IConfigProvider> create() {
+	return std::shared_ptr<IConfigProvider>(new ConfigImpl());
 }
 
 }

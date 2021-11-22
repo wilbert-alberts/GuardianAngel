@@ -6,7 +6,7 @@
  */
 
 #include "gtest/gtest.h"
-#include "Config.hpp"
+#include "IConfigProvider.hpp"
 #include "ConfigFactory.hpp"
 
 #include <iostream>

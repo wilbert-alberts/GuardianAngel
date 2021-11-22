@@ -5,12 +5,13 @@
  *      Author: wilbert
  */
 
-#include <Config.hpp>
+#include <Angel.hpp>
+#include <AngelFactory.hpp>
+#include <IConfigProvider.hpp>
 #include <LoadableAngel.hpp>
-
 #include <sstream>
 
-LoadableAngel::LoadableAngel(std::shared_ptr<Config> _cfg, int _idx)
+LoadableAngel::LoadableAngel(std::shared_ptr<IConfigProvider> _cfg, int _idx)
 : index(_idx), cfg(_cfg)
 {
 }
@@ -46,4 +47,13 @@ const std::string& LoadableAngel::getEnd(int intervalIdx) const {
 	std::stringstream startKeyStream;
 	startKeyStream << "interval_" << intervalIdx << "_" << "end";
 	return loadStr(startKeyStream.str());
+}
+
+std::shared_ptr<Angel> LoadableAngel::toAngel() {
+	auto r = AngelFactory::create(getPhoneNr());
+	int nrIntervals = getNrIntervals();
+	for (int i=0; i<nrIntervals; i++) {
+		r->addInterval(getStart(i), getEnd(i));
+	}
+	return r;
 }

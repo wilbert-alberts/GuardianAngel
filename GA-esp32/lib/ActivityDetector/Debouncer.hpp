@@ -9,7 +9,8 @@
 #define DEBOUNCER_HPP_
 
 
-#include "ValueProvider.hpp"
+#include <ValueProvider.hpp>
+#include <functional>
 
 class Debouncer {
 public:

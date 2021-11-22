@@ -33,9 +33,9 @@ public:
 	virtual void setAlarmProcessor(
 			std::shared_ptr<IAlarmProcessor> alarmProcessor);
 	virtual void setTimeProvider(std::shared_ptr<ITimeProvider> timeProvider);
+	virtual void setConfigProvider(std::shared_ptr<IConfigProvider> configMgr);
 	virtual void btnPressed();
 
-protected:
 	virtual void doTick();
 
 private:
@@ -46,6 +46,7 @@ private:
 	std::shared_ptr<IMessageProvider> messageProvider;
 	std::shared_ptr<ITimeProvider> clock;
 	std::shared_ptr<IActivityDetector> activityDetector;
+	std::shared_ptr<IConfigProvider> configProvider;
 
 	void processAngels();
 	void processMessages();
@@ -57,6 +58,8 @@ private:
 	std::shared_ptr<Angel> findAngel(const std::string &phoneNr);
 	std::shared_ptr<Angel> addAngel(const std::string &phoneNr);
 	void delAngel(const std::string &phoneNr);
+	void saveConfig();
+	void loadConfig();
 };
 
 

@@ -10,9 +10,9 @@
 
 class IActivityDetector {
 public:
-	virtual ~IActivityDetector();
+	virtual ~IActivityDetector() {}
 	virtual void clearActivity()=0;
-	virtual int getNrActiviations()=0;
+	virtual int getNrActivations()=0;
 };
 
 #endif /* INCLUDE_IACTIVITYDETECTOR_HPP_ */

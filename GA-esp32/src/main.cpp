@@ -37,6 +37,8 @@ int main()
 	std::cout << "Starting." << std::endl;
 
 	auto configProvider = ConfigFactory::create();
+	configProvider->loadProperties();
+
 	auto clock = ClockFactory::create();
 	auto activityDetector = ActivityDetectorFactory::create(readPIR);
 	auto helpBtn = ActivityDetectorFactory::create(readHelpBtn);
@@ -50,8 +52,6 @@ int main()
 	auto angelMgr = AngelMgrFactory::create();
 	angelMgr->setWatchDog(watchdog);
 	angelMgr->setHelpRequestDetector(helpBtn);
-
-	configProvider->loadProperties();
 
 	angelMgr->setConfigProvider(configProvider);
 

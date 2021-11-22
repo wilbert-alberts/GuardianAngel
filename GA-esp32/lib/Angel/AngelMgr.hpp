@@ -10,6 +10,7 @@
 
 #include <memory>
 
+class IConfigProvider;
 class IMessageProvider;
 class IButton;
 class IMessageProcessor;
@@ -28,6 +29,7 @@ public:
 	virtual void setActivityDetector(std::shared_ptr<IActivityDetector> activityDetector) = 0;
 	virtual void setAlarmProcessor(std::shared_ptr<IAlarmProcessor> alarmProcessor) = 0;
 	virtual void setTimeProvider(std::shared_ptr<ITimeProvider> timeProvider) = 0;
+	virtual void setConfigProvider(std::shared_ptr<IConfigProvider> configMgr) = 0;
 };
 
 
