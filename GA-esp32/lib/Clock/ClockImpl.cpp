@@ -7,14 +7,14 @@
 
 #include <Clock.hpp>
 #include <GSM.hpp>
-#include <PeriodicTask.hpp>
+#include <ITicking.hpp>
 #include <Time24.hpp>
 #include <Time24Factory.hpp>
 #include <iostream>
 #include <memory>
 #include <string>
 
-class ClockImpl: public Clock, public PeriodicTask {
+class ClockImpl: public Clock, public ITicking {
 	const int ALIGN_WITH_GSM_PERIOD_IN_SECS = (60 * 30); // Every 30 mins
 	const int CLOCK_PERIOD_IN_SECS = 1;
 
@@ -34,8 +34,8 @@ private:
 };
 
 ClockImpl::ClockImpl() :
-		PeriodicTask("Clock", CLOCK_PERIOD_IN_SECS * 1000, 4000), now(
-				Time24Factory::create(20, 0, 55)), gsm(nullptr), updateDue(0) {
+//		PeriodicTask("Clock", CLOCK_PERIOD_IN_SECS * 1000, 4000),
+		now(Time24Factory::create(20, 0, 55)), gsm(nullptr), updateDue(0) {
 }
 
 ClockImpl::~ClockImpl() {

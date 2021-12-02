@@ -39,7 +39,7 @@ TEST(AngelMgrSubscribe, NewSubscription) {
 	mgr->setActivityDetector(
 			std::shared_ptr<IActivityDetector>(dbgActivityDetector));
 
-	tickMgr->doTick();
+	tickMgr->tick();
 
 	//	std::cerr << dbgConfigProvider->ga_ini << std::endl;
 	ASSERT_EQ(dbgConfigProvider->ga_ini, "angel_0_interval_0_end=10:00:00\n"
@@ -72,7 +72,7 @@ TEST(AngelMgrSubscribe, TwoAngelsSubscriptions) {
 	mgr->setActivityDetector(
 			std::shared_ptr<IActivityDetector>(dbgActivityDetector));
 
-	tickMgr->doTick();
+	tickMgr->tick();
 
 	//	std::cerr << dbgConfigProvider->ga_ini << std::endl;
 	ASSERT_EQ(dbgConfigProvider->ga_ini, "angel_0_interval_0_end=10:00:00\n"
@@ -83,7 +83,7 @@ TEST(AngelMgrSubscribe, TwoAngelsSubscriptions) {
 
 	dbgClock->pushTime("8:00");
 	dbgMessageProvider->pushMessage(2, "0123456789", "subscribe 12:00 - 15:00");
-	tickMgr->doTick();
+	tickMgr->tick();
 
 //	std::cerr << dbgConfigProvider->ga_ini << std::endl;
 	ASSERT_EQ(dbgConfigProvider->ga_ini, "angel_0_interval_0_end=10:00:00\n"
@@ -119,7 +119,7 @@ TEST(AngelMgrSubscribe, TwoIntervalsSubscriptions) {
 	mgr->setActivityDetector(
 			std::shared_ptr<IActivityDetector>(dbgActivityDetector));
 
-	tickMgr->doTick();
+	tickMgr->tick();
 
 	//	std::cerr << dbgConfigProvider->ga_ini << std::endl;
 	ASSERT_EQ(dbgConfigProvider->ga_ini, "angel_0_interval_0_end=10:00:00\n"
@@ -130,7 +130,7 @@ TEST(AngelMgrSubscribe, TwoIntervalsSubscriptions) {
 
 	dbgClock->pushTime("8:00");
 	dbgMessageProvider->pushMessage(2, "0649882351", "subscribe 12:00 - 15:00");
-	tickMgr->doTick();
+	tickMgr->tick();
 
 //	std::cerr << dbgConfigProvider->ga_ini << std::endl;
 	ASSERT_EQ(dbgConfigProvider->ga_ini, "angel_0_interval_0_end=10:00:00\n"
@@ -172,7 +172,7 @@ TEST(AngelMgrSubscribe, UnSubscriptionOneInterval) {
 	mgr->setActivityDetector(
 			std::shared_ptr<IActivityDetector>(dbgActivityDetector));
 
-	tickMgr->doTick();
+	tickMgr->tick();
 
 //	std::cerr << dbgConfigProvider->ga_ini << std::endl;
 	ASSERT_EQ(dbgConfigProvider->ga_ini, "angel_0_interval_0_end=15:00:00\n"
@@ -211,7 +211,7 @@ TEST(AngelMgrSubscribe, UnSubscriptionLastInterval) {
 	mgr->setActivityDetector(
 			std::shared_ptr<IActivityDetector>(dbgActivityDetector));
 
-	tickMgr->doTick();
+	tickMgr->tick();
 
 //	std::cerr << dbgConfigProvider->ga_ini << std::endl;
 	ASSERT_EQ(dbgConfigProvider->ga_ini, "angel_0_interval_0_end=10:00:00\n"
@@ -248,7 +248,7 @@ TEST(AngelMgrSubscribe, UnSubscriptionAngel) {
 	mgr->setActivityDetector(
 			std::shared_ptr<IActivityDetector>(dbgActivityDetector));
 
-	tickMgr->doTick();
+	tickMgr->tick();
 
 //	std::cerr << dbgConfigProvider->ga_ini << std::endl;
 	ASSERT_EQ(dbgConfigProvider->ga_ini, "angel_0_interval_0_end=10:00:00\n"

@@ -10,15 +10,15 @@
 
 #include <Debouncer.hpp>
 #include <IActivityDetector.hpp>
-#include <PeriodicTask.hpp>
+#include <ITicking.hpp>
 #include <ValueProvider.hpp>
 
-class ActivityDetectorImpl: public IActivityDetector {
+class ActivityDetectorImpl: public IActivityDetector, public ITicking {
 public:
 	ActivityDetectorImpl(ValueProvider vp);
 	virtual ~ActivityDetectorImpl() {
 	}
-	virtual void doTick();
+	virtual void tick();
 	virtual void clearActivity();
 	virtual int getNrActivations();
 

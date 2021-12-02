@@ -47,18 +47,18 @@ TEST(AngelMgrActivity, NoAlarmNeeded) {
 			std::shared_ptr<IActivityDetector>(dbgActivityDetector));
 	mgr->setAlarmProcessor(std::shared_ptr<IAlarmProcessor>(dbgAlarmProcessor));
 
-	tickMgr->doTick();
+	tickMgr->tick();
 	dbgClock->advanceTime();
 	auto nrAngels = *dbgConfigProvider->getProperty("nr_angels");
 	ASSERT_EQ(nrAngels.compare("1"), 0);
 
 	ASSERT_FALSE(dbgAlarmProcessor->alarmSent());
 
-	tickMgr->doTick();
+	tickMgr->tick();
 	dbgClock->advanceTime();
 	ASSERT_FALSE(dbgAlarmProcessor->alarmSent());
 
-	tickMgr->doTick();
+	tickMgr->tick();
 	dbgClock->advanceTime();
 	ASSERT_FALSE(dbgAlarmProcessor->alarmSent());
 }
@@ -95,23 +95,23 @@ TEST(AngelMgrActivity, AlarmNeeded) {
 			std::shared_ptr<IActivityDetector>(dbgActivityDetector));
 	mgr->setAlarmProcessor(std::shared_ptr<IAlarmProcessor>(dbgAlarmProcessor));
 
-	tickMgr->doTick();
+	tickMgr->tick();
 	dbgClock->advanceTime();
 	auto nrAngels = *dbgConfigProvider->getProperty("nr_angels");
 	ASSERT_EQ(nrAngels.compare("3"), 0);
 
 	ASSERT_FALSE(dbgAlarmProcessor->alarmSent());
 
-	tickMgr->doTick();
+	tickMgr->tick();
 	dbgClock->advanceTime();
 	ASSERT_FALSE(dbgAlarmProcessor->alarmSent());
 
-	tickMgr->doTick();
+	tickMgr->tick();
 	dbgClock->advanceTime();
 	ASSERT_TRUE(dbgAlarmProcessor->alarmSent());
 
 	auto alarmRecipients =dbgAlarmProcessor->getAlarmRecipients();
-	ASSERT_EQ(alarmRecipients.size(), 1);
+	ASSERT_EQ(alarmRecipients.size(), (size_t)1);
 	auto rec = std::find(alarmRecipients.begin(), alarmRecipients.end(), "0649882351");
 	ASSERT_TRUE(rec != alarmRecipients.end());
 }

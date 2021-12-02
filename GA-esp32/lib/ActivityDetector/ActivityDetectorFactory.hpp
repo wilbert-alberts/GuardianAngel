@@ -15,7 +15,7 @@ class IActivityDetector;
 
 namespace ActivityDetectorFactory {
 	std::shared_ptr<IActivityDetector> create(ValueProvider vp);
-	std::shared_ptr<IActivityDetector> createTask(ValueProvider vp);
+//	std::shared_ptr<IActivityDetector> createTask(ValueProvider vp);
 }
 
 #endif /* LIB_ACTIVITYDETECTOR_ACTIVITYDETECTORFACTORY_HPP_ */

@@ -31,7 +31,7 @@ TEST(ActivityDetector, NoActivity) {
 
 	size_t nrSamples = 0;
 	while (nrSamples < sizeof(activity) / sizeof(int) - 1) {
-		adTick->doTick();
+		adTick->tick();
 		ASSERT_EQ(0, ad->getNrActivations());
 
 		nrSamples++;
@@ -48,7 +48,7 @@ TEST(ActivityDetector, NoActivityWithNoise) {
 
 	size_t nrSamples = 0;
 	while (nrSamples < sizeof(activity) / sizeof(int) - 1) {
-		adTick->doTick();
+		adTick->tick();
 		ASSERT_EQ(0, ad->getNrActivations());
 
 		nrSamples++;
@@ -66,7 +66,7 @@ TEST(ActivityDetector, ActivityWithNoNoise) {
 
 	size_t nrSamples = 0;
 	while (nrSamples < sizeof(activity) / sizeof(int) - 1) {
-		adTick->doTick();
+		adTick->tick();
 
 		if (nrSamples < 7) {
 			ASSERT_EQ(0, ad->getNrActivations());
@@ -95,7 +95,7 @@ TEST(ActivityDetector, ActivityWithNoiseAndBackToIdle) {
 
 	size_t nrSamples = 0;
 	while (nrSamples < sizeof(activity) / sizeof(int) - 1) {
-		adTick->doTick();
+		adTick->tick();
 
 //		std::cerr << ". " << nrSamples << ", " << ad->getNrActivations()
 //				<< std::endl;

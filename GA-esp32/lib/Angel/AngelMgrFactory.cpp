@@ -5,19 +5,22 @@
  *      Author: wilbert
  */
 
+#include <AngelMgrImpl.hpp>
+#include <PeriodicTask.hpp>
 #include <memory>
-
-#include "AngelMgrImpl.hpp"
-#include "AngelMgrTaskImpl.hpp"
 
 class AngelMgr;
 
 namespace AngelMgrFactory {
+
 std::shared_ptr<AngelMgr> create() {
 	return std::shared_ptr<AngelMgr>(new AngelMgrImpl());
 }
-std::shared_ptr<AngelMgr> createTask() {
-	return std::shared_ptr<AngelMgr>(new AngelMgrTaskImpl());
+
+PeriodicTask* createTask() {
+	auto am = std::shared_ptr<AngelMgrImpl>(new AngelMgrImpl());
+	auto r = new PeriodicTask("AngelMgr", am, 1000, 4000);
+	return r;
 
 }
 

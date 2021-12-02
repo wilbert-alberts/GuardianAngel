@@ -1,20 +1,17 @@
-#include "platform.hpp"
+#include <ITicking.hpp>
+#include <PeriodicTask.hpp>
+#include <unistd.h>
 
-#include "PeriodicTask.hpp"
-
-PeriodicTask::PeriodicTask(const char *taskName, int periodInMs, int stackSize)
-: ActiveTask(taskName, stackSize)
-, period(periodInMs)
-, terminateRequested(																																		   false)
-{
+PeriodicTask::PeriodicTask(const char *taskName,
+		std::shared_ptr<ITicking> _ticker, int periodInMs, int stackSize) :
+		ActiveTask(taskName, stackSize), ticker(_ticker), period(periodInMs), terminateRequested(
+				false) {
 }
 
-void PeriodicTask::task()
-{
+void PeriodicTask::task() {
 #ifdef GA_POSIX
-	while (1)
-	{
-		tick();
+	while (1) {
+		ticker->tick();
 		usleep(1000 * period);
 	}
 #else
@@ -22,7 +19,7 @@ void PeriodicTask::task()
 	auto now = xTaskGetTickCount();
 	while (1)
 	{
-	    tick();
+	    ticker->tick();
 	    vTaskDelayUntil(&now, pdMS_TO_TICKS(period));
 	}
 #endif

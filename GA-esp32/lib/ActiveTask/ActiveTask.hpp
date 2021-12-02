@@ -3,6 +3,10 @@
 #ifndef ACTIVETASK_HPP_
 #define ACTIVETASK_HPP_
 
+#ifdef GA_POSIX
+#include <pthread.h>
+#endif
+
 class ActiveTask
 {
 public:

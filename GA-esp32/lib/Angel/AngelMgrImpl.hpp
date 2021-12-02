@@ -10,6 +10,7 @@
 
 #include <AngelMgr.hpp>
 #include <IBtnListener.hpp>
+#include <ITicking.hpp>
 #include <memory>
 #include <string>
 #include <vector>
@@ -19,7 +20,7 @@ class IMessage;
 class IMessageProvider;
 
 
-class AngelMgrImpl: public AngelMgr, public IBtnListener {
+class AngelMgrImpl: public AngelMgr, public IBtnListener, public ITicking {
 public:
 	virtual ~AngelMgrImpl() {
 	}
@@ -36,7 +37,7 @@ public:
 	virtual void setConfigProvider(std::shared_ptr<IConfigProvider> configMgr);
 	virtual void btnPressed();
 
-	virtual void doTick();
+	virtual void tick();
 
 private:
 	std::vector<std::shared_ptr<Angel>> angels;

@@ -72,7 +72,7 @@ void AngelMgrImpl::setConfigProvider(
 	loadConfig();
 }
 
-void AngelMgrImpl::doTick() {
+void AngelMgrImpl::tick() {
 	processAngels();
 	processMessages();
 }
