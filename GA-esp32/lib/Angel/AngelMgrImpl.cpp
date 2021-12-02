@@ -20,6 +20,7 @@
 #include <SaveableAngel.hpp>
 #include <Time24.hpp>
 #include <algorithm>
+#include <iostream>
 #include <iterator>
 
 void AngelMgrImpl::resetAngels() {
@@ -85,10 +86,11 @@ void AngelMgrImpl::processAngels() {
 
 	// Determine angels that have not yet been alarmed
 	std::vector<std::shared_ptr<Angel>> activeAngels;
-	std::copy_if(angels.begin(), angels.end(), activeAngels.begin(),
-			[&](auto a) {
-				return !(a->helpNeeded());
-			});
+	std::for_each(angels.begin(), angels.end(), [&](auto a) {
+		if (!(a->helpNeeded())) {
+			activeAngels.push_back(a);
+		}
+	});
 
 	// Tell angels that have not yet been alarmed
 	std::for_each(activeAngels.begin(), activeAngels.end(), [&](auto a) {
@@ -186,9 +188,12 @@ void AngelMgrImpl::unsubscribeAngel(const std::string &phonenr,
 		const std::string &start, const std::string &end, bool save) {
 	auto angel = findAngel(phonenr);
 	if (angel != nullptr) {
-		if (start != "" || end != "")
+		if (start != "" || end != "") {
 			angel->delInterval(start, end);
-		else {
+			if (angel->getNrIntervals() == 0) {
+				delAngel(phonenr);
+			}
+		} else {
 			delAngel(phonenr);
 		}
 	}
@@ -202,6 +207,7 @@ void AngelMgrImpl::saveConfig() {
 			auto sa = new SaveableAngel(angels[i], configProvider, i);
 			sa->save();
 		}
+		configProvider->saveProperties();
 	}
 }
 
@@ -212,7 +218,7 @@ void AngelMgrImpl::loadConfig() {
 		if (nrAngelsStr != nullptr) {
 			nrAngels = std::stoi(*nrAngelsStr);
 		}
-		for (int i=0; i<nrAngels; i++) {
+		for (int i = 0; i < nrAngels; i++) {
 			auto newLAngel = new LoadableAngel(configProvider, i);
 			auto newAngel = newLAngel->toAngel();
 			angels.push_back(newAngel);

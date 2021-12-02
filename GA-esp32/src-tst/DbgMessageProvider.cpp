@@ -30,8 +30,8 @@ void DbgMessageProvider::pushMessage(MessageID id, const std::string& phoneNr, c
 
 std::vector<MessageID> DbgMessageProvider::getMessageIDs() const {
 	std::vector<MessageID> r;
-	std::transform(messages.begin(), messages.end(), r.begin(), [](auto msg) {
-				return msg->getMessageID();
+	std::for_each(messages.begin(), messages.end(), [&](auto msg) {
+				r.push_back(msg->getMessageID());
 			});
 
 	return r;
