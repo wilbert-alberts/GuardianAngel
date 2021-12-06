@@ -5,20 +5,22 @@
  *      Author: wilbert
  */
 
-
+#include <ActivityDetectorFactory.hpp>
+#include <AlarmStation.hpp>
+#include <AlarmStationFactory.hpp>
+#include <AngelMgr.hpp>
+#include <AngelMgrFactory.hpp>
+#include <Clock.hpp>
+#include <ClockFactory.hpp>
+#include <ConfigFactory.hpp>
+#include <GSM.hpp>
+#include <GSMFactory.hpp>
+#include <HelpButton.hpp>
+#include <IActivityDetector.hpp>
+#include <IButton.hpp>
+#include <IConfigProvider.hpp>
 #include <iostream>
-
-#include "platform.hpp"
-
-#include "ClockFactory.hpp"
-#include "Clock.hpp"
-#include "ActivityDetectorFactory.hpp"
-#include "ConfigFactory.hpp"
-#include "WatchDogFactory.hpp"
-#include "WatchDog.hpp"
-#include "AngelMgrFactory.hpp"
-#include "AngelMgr.hpp"
-#include "GSMFactory.hpp"
+#include <memory>
 
 #ifdef GA_POSIX
 
@@ -32,28 +34,38 @@ int readHelpBtn() {
 	return 0;
 }
 
-int main()
-{
+int main() {
 	std::cout << "Starting." << std::endl;
 
+	// Do all wiring
 	auto configProvider = ConfigFactory::create();
 	configProvider->loadProperties();
 
-	auto clock = ClockFactory::create();
-	auto activityDetector = ActivityDetectorFactory::create(readPIR);
-	auto helpBtn = ActivityDetectorFactory::create(readHelpBtn);
 	auto gsm = GSMFactory::create();
 
+	auto clock = ClockFactory::create();
 	clock->setGSM(gsm);
 
-	auto watchdog = WatchDogFactory::create();
-	watchdog->setClock(clock);
+	auto activityDetector = ActivityDetectorFactory::create(readPIR);
+
+	auto helpBtn = HelpButtonFactory::create(readHelpBtn);
+
+	auto alarmProcessor = AlarmStationFactory::create();
+	alarmProcessor->setMessageSender(gsm);
 
 	auto angelMgr = AngelMgrFactory::create();
-	angelMgr->setWatchDog(watchdog);
-	angelMgr->setHelpRequestDetector(helpBtn);
-
 	angelMgr->setConfigProvider(configProvider);
+	angelMgr->setHelpButton(helpBtn);
+	angelMgr->setMessageProvider(gsm);
+	angelMgr->setActivityDetector(activityDetector);
+	angelMgr->setAlarmProcessor(alarmProcessor);
+	angelMgr->setTimeProvider(clock);
+
+	// Create active processes
+	auto helpButtonTask = helpBtn->createTask();
+	auto activityDetectorTask = activityDetector->createTask();
+	auto angelMgrTask = angelMgr->createTask();
+	auto clockTask = clock->createTask();
 
 	std::cout << "Started." << std::endl;
 
@@ -64,8 +76,6 @@ int main()
 
 	return 0;
 }
-
-
 
 #else
 

@@ -9,15 +9,16 @@
 #define INCLUDE_IBUTTON_HPP_
 
 #include <memory>
-
-class IBtnListener;
+#include <IBtnListener.hpp>
+class PeriodicTask;
 
 class IButton
 {
 public:
-	virtual ~IButton();
-	virtual void addListener(std::shared_ptr<IBtnListener> listener);
-	virtual void delListener(std::shared_ptr<IBtnListener>listener);
+	virtual ~IButton() {}
+	virtual PeriodicTask* createTask() = 0;
+	virtual void addListener(std::shared_ptr<IBtnListener> listener) = 0;
+	virtual void delListener(std::shared_ptr<IBtnListener>listener) = 0;
 };
 
 

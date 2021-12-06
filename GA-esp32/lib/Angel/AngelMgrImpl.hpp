@@ -24,7 +24,7 @@ class AngelMgrImpl: public AngelMgr, public IBtnListener, public ITicking {
 public:
 	virtual ~AngelMgrImpl() {
 	}
-
+	virtual PeriodicTask* createTask();
 	virtual void resetAngels();
 	virtual void setHelpButton(std::shared_ptr<IButton> helpButton);
 	virtual void setMessageProvider(

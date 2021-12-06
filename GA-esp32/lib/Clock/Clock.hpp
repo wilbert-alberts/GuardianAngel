@@ -12,6 +12,8 @@
 #include <ITimeProvider.hpp>
 #include <memory>
 
+class PeriodicTask;
+
 class Time24;
 class GSM;
 
@@ -20,6 +22,7 @@ public:
     virtual ~Clock() {};
     virtual std::shared_ptr<Time24> getTime() const = 0;
     virtual void setGSM(std::shared_ptr<GSM> gsm) = 0;
+    virtual PeriodicTask* createTask() = 0;
 };
 
 #endif

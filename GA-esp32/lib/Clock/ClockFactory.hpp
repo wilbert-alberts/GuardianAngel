@@ -11,6 +11,8 @@
 
 #include <memory>
 
+class PeriodicTask;
+
 class Clock;
 
 namespace ClockFactory {

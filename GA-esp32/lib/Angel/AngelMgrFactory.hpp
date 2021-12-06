@@ -10,12 +10,12 @@
 
 #include <memory>
 
+class PeriodicTask;
+
 class AngelMgr;
 
 namespace AngelMgrFactory {
 std::shared_ptr<AngelMgr> create();
-std::shared_ptr<AngelMgr> createTask();
-
 }
 
 #endif /* LIB_ANGEL_ANGELMGRFACTORY_HPP_ */

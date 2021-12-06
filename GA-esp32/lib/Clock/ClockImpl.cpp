@@ -8,6 +8,7 @@
 #include <Clock.hpp>
 #include <GSM.hpp>
 #include <ITicking.hpp>
+#include <PeriodicTask.hpp>
 #include <Time24.hpp>
 #include <Time24Factory.hpp>
 #include <iostream>
@@ -16,14 +17,16 @@
 
 class ClockImpl: public Clock, public ITicking {
 	const int ALIGN_WITH_GSM_PERIOD_IN_SECS = (60 * 30); // Every 30 mins
-	const int CLOCK_PERIOD_IN_SECS = 1;
 
 public:
+	const int CLOCK_PERIOD_IN_SECS = 1;
+
 	ClockImpl();
 	virtual ~ClockImpl();
 	virtual void tick();
 	virtual std::shared_ptr<Time24> getTime() const;
 	virtual void setGSM(std::shared_ptr<GSM> gsm);
+	virtual PeriodicTask* createTask();
 
 private:
 	std::shared_ptr<Time24> now;
@@ -39,6 +42,11 @@ ClockImpl::ClockImpl() :
 }
 
 ClockImpl::~ClockImpl() {
+}
+
+
+PeriodicTask* ClockImpl::createTask() {
+	return new PeriodicTask("clock", std::shared_ptr<ITicking>(this), 1000, 4000);
 }
 
 void ClockImpl::tick() {
@@ -82,5 +90,6 @@ namespace ClockFactory {
 std::shared_ptr<Clock> create() {
 	return std::shared_ptr<Clock>(new ClockImpl());
 }
+
 }
 

@@ -6,8 +6,9 @@
  */
 
 #include <ActivityDetectorImpl.hpp>
-#include <memory>
+#include <AngelFactory.hpp>
 #include <PeriodicTask.hpp>
+#include <memory>
 
 class IActivityDetector;
 
@@ -18,6 +19,10 @@ ActivityDetectorImpl::ActivityDetectorImpl(ValueProvider vp) :
 
 }
 
+PeriodicTask* ActivityDetectorImpl::createTask() {
+	return new PeriodicTask("activityDetector", std::shared_ptr<ITicking>(this),
+			10, 4000);
+}
 void ActivityDetectorImpl::tick() {
 	bool changed = activityDebouncer.tick();
 
@@ -40,13 +45,6 @@ namespace ActivityDetectorFactory {
 std::shared_ptr<IActivityDetector> create(ValueProvider vp) {
 	return std::shared_ptr<IActivityDetector>(new ActivityDetectorImpl(vp));
 }
-
-PeriodicTask* createTask(ValueProvider vp) {
-	auto ad = std::shared_ptr<ActivityDetectorImpl>(new ActivityDetectorImpl(vp));
-	auto r = new PeriodicTask("ActivityDetector", ad, 50, 4000);
-	return r;
-}
-
 
 }
 

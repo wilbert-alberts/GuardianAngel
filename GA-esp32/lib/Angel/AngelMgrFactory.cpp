@@ -6,7 +6,6 @@
  */
 
 #include <AngelMgrImpl.hpp>
-#include <PeriodicTask.hpp>
 #include <memory>
 
 class AngelMgr;
@@ -17,12 +16,6 @@ std::shared_ptr<AngelMgr> create() {
 	return std::shared_ptr<AngelMgr>(new AngelMgrImpl());
 }
 
-PeriodicTask* createTask() {
-	auto am = std::shared_ptr<AngelMgrImpl>(new AngelMgrImpl());
-	auto r = new PeriodicTask("AngelMgr", am, 1000, 4000);
-	return r;
-
-}
 
 }
 

@@ -16,13 +16,16 @@
 #include <IMessageProvider.hpp>
 #include <ITimeProvider.hpp>
 #include <LoadableAngel.hpp>
+#include <PeriodicTask.hpp>
 #include <stddef.h>
 #include <SaveableAngel.hpp>
 #include <Time24.hpp>
 #include <algorithm>
-#include <iostream>
 #include <iterator>
 
+PeriodicTask* AngelMgrImpl::createTask() {
+	return new PeriodicTask("angelMgr", std::shared_ptr<ITicking>(this), 60*1000, 4000);
+}
 void AngelMgrImpl::resetAngels() {
 	std::for_each(alarmedAngels.begin(), alarmedAngels.end(), [&](auto a) {
 		angels.push_back(a);

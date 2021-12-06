@@ -51,7 +51,7 @@ AngelMgr -->TimeProvider: tp
 Angel *--> WatchInterval: intervals
 AngelMgr --> IAlarmProcessor: alarmProcessor
 
-class GSM <<Static>> <<PeriodicTask>>{
+class GSM <<Static>> {
 	void sendMessage(string phoneNr, string msg);
 	vector<MessageID> getMessageIDs();
 	Message getMessage(MessageID id);

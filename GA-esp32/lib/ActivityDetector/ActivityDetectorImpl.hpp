@@ -18,6 +18,7 @@ public:
 	ActivityDetectorImpl(ValueProvider vp);
 	virtual ~ActivityDetectorImpl() {
 	}
+	virtual PeriodicTask* createTask();
 	virtual void tick();
 	virtual void clearActivity();
 	virtual int getNrActivations();
