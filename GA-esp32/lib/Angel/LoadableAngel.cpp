@@ -10,6 +10,7 @@
 #include <IConfigProvider.hpp>
 #include <LoadableAngel.hpp>
 #include <sstream>
+#include <stdlib.h>
 
 LoadableAngel::LoadableAngel(std::shared_ptr<IConfigProvider> _cfg, int _idx)
 : index(_idx), cfg(_cfg)
@@ -33,7 +34,7 @@ const std::string& LoadableAngel::getPhoneNr() const {
 }
 
 int LoadableAngel::getNrIntervals() const {
-	return std::stoi(loadStr("nrIntervals"));
+	return atoi(loadStr("nrIntervals").c_str());
 }
 
 const std::string& LoadableAngel::getStart(int intervalIdx) const {

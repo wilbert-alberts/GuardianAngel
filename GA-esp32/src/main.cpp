@@ -79,6 +79,16 @@ int main() {
 
 #else
 
+#include <Arduino.h>
+
+int readPIR() {
+	return 1;
+}
+
+int readHelpBtn() {
+	return 1;
+}
+
 void setup()
 {
 	Serial.begin(115200);

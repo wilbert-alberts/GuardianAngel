@@ -60,25 +60,26 @@ const std::string& AngelImpl::getPhoneNr() const {
 }
 
 void AngelImpl::reset() {
-	std::for_each(intervals.begin(), intervals.end(), [](auto i){
+//	std::for_each(intervals.begin(), intervals.end(), [](auto i){
+	std::for_each(intervals.begin(), intervals.end(), [](std::shared_ptr<WatchInterval> i){
 		i->reset();
 	});
 }
 
 void AngelImpl::timeProgress(std::shared_ptr<Time24> now) {
-	std::for_each(intervals.begin(), intervals.end(), [&](auto i){
+	std::for_each(intervals.begin(), intervals.end(), [&](std::shared_ptr<WatchInterval> i){
 		i->timeProgress(now);
 	});
 }
 
 void AngelImpl::activityDetected() {
-	std::for_each(intervals.begin(), intervals.end(), [&](auto i){
+	std::for_each(intervals.begin(), intervals.end(), [](std::shared_ptr<WatchInterval> i){
 		i->activityDetected();
 	});
 }
 
 bool AngelImpl::helpNeeded() {
-	return std::any_of(intervals.begin(), intervals.end(), [&](auto i){
+	return std::any_of(intervals.begin(), intervals.end(), [&](std::shared_ptr<WatchInterval> i){
 		return i->getState() == IntervalState::HELPNEEDED;
 	});
 }

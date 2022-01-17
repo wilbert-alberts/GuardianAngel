@@ -5,6 +5,8 @@
 
 #ifdef GA_POSIX
 #include <pthread.h>
+#else
+#include "FreeRTOS.h"
 #endif
 
 class ActiveTask

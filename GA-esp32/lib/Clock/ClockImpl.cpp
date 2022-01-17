@@ -15,6 +15,12 @@
 #include <memory>
 #include <string>
 
+#ifdef GA_POSIX
+#else
+#include <Arduino.h>
+#endif
+
+
 class ClockImpl: public Clock, public ITicking {
 	const int ALIGN_WITH_GSM_PERIOD_IN_SECS = (60 * 30); // Every 30 mins
 

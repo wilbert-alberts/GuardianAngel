@@ -12,7 +12,7 @@
 #include <WatchInterval.hpp>
 #include <IConfigProvider.hpp>
 #include <sstream>
-
+#include <stdlib.h>
 
 SaveableAngel::SaveableAngel(std::shared_ptr<Angel> a, std::shared_ptr<IConfigProvider> _cfg, int idx) : index(idx), angel(a), cfg(_cfg){
 
@@ -40,7 +40,10 @@ void SaveableAngel::savePhoneNr() {
 }
 
 void SaveableAngel::saveIntervals() {
-	saveStr("nrIntervals", std::to_string(angel->getNrIntervals()));
+	static char buffer[40];
+	itoa(angel->getNrIntervals(), buffer,10);
+	std::string  nrIntervalsAsString(buffer);
+	saveStr("nrIntervals", nrIntervalsAsString);
 	for (auto idx=0; idx<angel->getNrIntervals(); idx++) {
 		saveInterval(idx, angel->getInterval(idx));
 	}

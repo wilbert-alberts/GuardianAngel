@@ -31,14 +31,14 @@ void HelpButton::addListener(std::shared_ptr<IBtnListener> listener) {
 
 void HelpButton::delListener(std::shared_ptr<IBtnListener> listener) {
 	auto newEnd = std::remove_if(listeners.begin(), listeners.end(),
-			[&](auto el) {
+			[&](std::shared_ptr<IBtnListener> el) {
 				return el == listener;
 			});
 	listeners.erase(newEnd, listeners.end());
 }
 
 void HelpButton::notifyListeners() {
-	std::for_each(listeners.begin(), listeners.end(), [](auto l) {
+	std::for_each(listeners.begin(), listeners.end(), [](std::shared_ptr<IBtnListener> l) {
 		l->btnPressed();
 	});
 }

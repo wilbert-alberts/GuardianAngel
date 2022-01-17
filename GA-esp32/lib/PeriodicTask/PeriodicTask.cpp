@@ -2,6 +2,12 @@
 #include <PeriodicTask.hpp>
 #include <unistd.h>
 
+#ifdef GA_POSIX
+#else
+#include <Arduino.h>
+#endif
+
+
 PeriodicTask::PeriodicTask(const char *taskName,
 		std::shared_ptr<ITicking> _ticker, int periodInMs, int stackSize) :
 		ActiveTask(taskName, stackSize), ticker(_ticker), period(periodInMs), terminateRequested(
@@ -15,7 +21,7 @@ void PeriodicTask::task() {
 		usleep(1000 * period);
 	}
 #else
-	Serial.println("> PeriodicTask::task()");
+	Serial.printf("> PeriodicTask::task()\n");
 	auto now = xTaskGetTickCount();
 	while (1)
 	{

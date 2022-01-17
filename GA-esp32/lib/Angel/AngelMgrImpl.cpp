@@ -22,12 +22,13 @@
 #include <Time24.hpp>
 #include <algorithm>
 #include <iterator>
+#include <stdlib.h>
 
 PeriodicTask* AngelMgrImpl::createTask() {
 	return new PeriodicTask("angelMgr", std::shared_ptr<ITicking>(this), 60*1000, 4000);
 }
 void AngelMgrImpl::resetAngels() {
-	std::for_each(alarmedAngels.begin(), alarmedAngels.end(), [&](auto a) {
+	std::for_each(alarmedAngels.begin(), alarmedAngels.end(), [&](std::shared_ptr<Angel> a) {
 		angels.push_back(a);
 	});
 	alarmedAngels.clear();
@@ -40,10 +41,10 @@ void AngelMgrImpl::setHelpButton(std::shared_ptr<IButton> helpButton) {
 void AngelMgrImpl::btnPressed() {
 	if (alarmProcessor != nullptr) {
 		// Send alarm to every angel
-		std::for_each(angels.begin(), angels.end(), [&](auto a) {
+		std::for_each(angels.begin(), angels.end(), [&](std::shared_ptr<Angel> a) {
 			alarmProcessor->sendAlarm(a->getPhoneNr());
 		});
-		std::for_each(alarmedAngels.begin(), alarmedAngels.end(), [&](auto a) {
+		std::for_each(alarmedAngels.begin(), alarmedAngels.end(), [&](std::shared_ptr<Angel> a) {
 			alarmProcessor->sendAlarm(a->getPhoneNr());
 		});
 	}
@@ -89,14 +90,14 @@ void AngelMgrImpl::processAngels() {
 
 	// Determine angels that have not yet been alarmed
 	std::vector<std::shared_ptr<Angel>> activeAngels;
-	std::for_each(angels.begin(), angels.end(), [&](auto a) {
+	std::for_each(angels.begin(), angels.end(), [&](std::shared_ptr<Angel> a) {
 		if (!(a->helpNeeded())) {
 			activeAngels.push_back(a);
 		}
 	});
 
 	// Tell angels that have not yet been alarmed
-	std::for_each(activeAngels.begin(), activeAngels.end(), [&](auto a) {
+	std::for_each(activeAngels.begin(), activeAngels.end(), [&](std::shared_ptr<Angel> a) {
 		a->timeProgress(now);
 		if (nrActivations > 0)
 			a->activityDetected();
@@ -104,7 +105,7 @@ void AngelMgrImpl::processAngels() {
 
 	// Send alarm to angels when needed
 	if (alarmProcessor != nullptr) {
-		std::for_each(activeAngels.begin(), activeAngels.end(), [&](auto a) {
+		std::for_each(activeAngels.begin(), activeAngels.end(), [&](std::shared_ptr<Angel> a) {
 			if (a->helpNeeded()) {
 				alarmProcessor->sendAlarm(a->getPhoneNr());
 				alarmedAngels.push_back(a);
@@ -161,12 +162,12 @@ std::shared_ptr<Angel> AngelMgrImpl::addAngel(const std::string &phoneNr) {
 
 void AngelMgrImpl::delAngel(const std::string &phoneNr) {
 	auto newAngelEnd = std::remove_if(angels.begin(), angels.end(),
-			[&](auto a) {
+			[&](std::shared_ptr<Angel> a) {
 				return a->getPhoneNr() == phoneNr;
 			});
 	angels.erase(newAngelEnd, angels.end());
 	auto newAlarmedAngelEnd = std::remove_if(alarmedAngels.begin(),
-			alarmedAngels.end(), [&](auto a) {
+			alarmedAngels.end(), [&](std::shared_ptr<Angel> a) {
 				return a->getPhoneNr() == phoneNr;
 			});
 	alarmedAngels.erase(newAlarmedAngelEnd, alarmedAngels.end());
@@ -204,8 +205,11 @@ void AngelMgrImpl::unsubscribeAngel(const std::string &phonenr,
 }
 
 void AngelMgrImpl::saveConfig() {
+	static char buffer[40];
 	if (configProvider) {
-		configProvider->putProperty("nr_angels", std::to_string(angels.size()));
+		itoa((int)(angels.size()), buffer, 10);
+		std::string nrAngelsAsString(buffer);
+		configProvider->putProperty("nr_angels", nrAngelsAsString);
 		for (size_t i = 0; i < angels.size(); i++) {
 			auto sa = new SaveableAngel(angels[i], configProvider, i);
 			sa->save();
@@ -219,7 +223,7 @@ void AngelMgrImpl::loadConfig() {
 		auto nrAngelsStr = configProvider->getProperty("nr_angels");
 		int nrAngels = 0;
 		if (nrAngelsStr != nullptr) {
-			nrAngels = std::stoi(*nrAngelsStr);
+			nrAngels = atoi(nrAngelsStr->c_str());
 		}
 		for (int i = 0; i < nrAngels; i++) {
 			auto newLAngel = new LoadableAngel(configProvider, i);

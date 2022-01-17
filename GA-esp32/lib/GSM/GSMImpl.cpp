@@ -5,7 +5,6 @@
  *      Author: wilbert
  */
 
-#include <bits/types/struct_tm.h>
 #include <GSM.hpp>
 #include <IMessage.hpp>
 #include <Time24.hpp>
@@ -18,6 +17,7 @@
 #include <vector>
 
 #ifdef GA_POSIX
+#include <bits/types/struct_tm.h>
 #include <chrono>
 #include <time.h>
 
