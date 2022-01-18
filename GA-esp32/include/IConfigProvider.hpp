@@ -23,6 +23,9 @@ public:
 
     virtual const std::string* getProperty(const std::string& id)=0;
 
+    virtual void loadProperties(std::string& props)=0;
+    virtual void saveProperties(const std::string& props)=0;
+
 };
 
 

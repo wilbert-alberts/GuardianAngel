@@ -65,10 +65,24 @@ void ConfigImpl::saveProperties() {
 
 #else
 
+#include <EEPROM.h>
+
 void ConfigImpl::loadProperties() {
+	
 }
 
 void ConfigImpl::saveProperties() {
+
+}
+
+void ConfigImpl::loadProperties(std::string& props) {
+	String sprops = EEPROM.readString(0);
+	props.clear();
+	props = sprops.c_str();
+}
+
+void ConfigImpl::saveProperties(const std::string& props) {
+	EEPROM.writeString(0, props.c_str());
 }
 
 #endif

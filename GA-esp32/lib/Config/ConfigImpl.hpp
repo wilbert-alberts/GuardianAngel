@@ -25,6 +25,8 @@ public:
 	virtual void clear();
 	virtual void loadProperties();
 	virtual void saveProperties();
+	virtual void loadProperties(std::string& props);
+	virtual void saveProperties(const std::string& props);
 
 	virtual void putProperty(const std::string &id, const std::string &value);
 
