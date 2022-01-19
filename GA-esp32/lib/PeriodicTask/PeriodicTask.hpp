@@ -22,7 +22,8 @@ private:
     int period;
 
 #ifdef GA_POSIX
-
+    sem_t continueRunning;
+    sem_t terminated;
 #else
     SemaphoreHandle_t continueRunning;
     SemaphoreHandle_t terminated;
