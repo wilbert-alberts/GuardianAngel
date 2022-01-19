@@ -18,8 +18,9 @@
 class ConfigImpl: public IConfigProvider {
 public:
 
-	virtual ~ConfigImpl() {
-	}
+	ConfigImpl();
+	virtual ~ConfigImpl();
+
 	virtual void loadProperties(std::string& props);
 	virtual void saveProperties(const std::string& props);
 };

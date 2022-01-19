@@ -15,10 +15,13 @@ public:
     ActiveTask(const char *taskName, int stackSize = 1000);
     virtual ~ActiveTask();
 
-protected:
+    virtual void startTask();
     virtual void task() = 0;
+    virtual void endTask();
 
 private:
+    const char* taskName;
+    int stackSize;
 #ifdef GA_POSIX
     pthread_t thread;
     static void* _task(void *obj);

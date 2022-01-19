@@ -2,14 +2,28 @@
 
 #include "ActiveTask.hpp"
 
-ActiveTask::ActiveTask(const char *taskName, int stackSize)
+ActiveTask::ActiveTask(const char *tn, int ss):
+taskName(tn), stackSize(ss)
 {
+    LOG("> ActiveTask::ActiveTask()");
+
+    LOG("< ActiveTask::ActiveTask()");
+}
+
+ActiveTask::~ActiveTask()
+{
+
+}
+
+void ActiveTask::startTask() 
+{
+    LOG("> ActiveTask::startTask()");
 #ifdef GA_POSIX
 
     pthread_create(&thread, NULL, ActiveTask::_task, this);
 
 #else
-    Serial.println("> ActiveTask::ActiveTask()");
+
     xTaskCreate(
         ActiveTask::_task,
         taskName,
@@ -19,15 +33,18 @@ ActiveTask::ActiveTask(const char *taskName, int stackSize)
         &taskHandle);
 
 #endif
+    LOG("< ActiveTask::startTask()");
 }
 
-ActiveTask::~ActiveTask()
+void ActiveTask::endTask() 
 {
+    LOG("> ActiveTask::endTask()");
 #ifdef GA_POSIX
     pthread_kill(thread, SIGTERM);
 #else
     vTaskDelete(taskHandle);
 #endif
+    LOG("< ActiveTask::endTask()");
 }
 
 #ifdef GA_POSIX
@@ -40,6 +57,7 @@ void ActiveTask::_task(void *p)
 
     obj->task();
 
+    while(1);
 #ifdef GA_POSIX
     return nullptr;
 #endif

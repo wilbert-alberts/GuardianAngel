@@ -11,9 +11,6 @@
 
 // 'undefine' GA_POSIX for AVR ESP32 platform.
 
-//#define GA_POSIX
-
-
 #ifdef GA_POSIX
 
 #include <pthread.h>
@@ -21,9 +18,14 @@
 #include <unistd.h>
 #include <iostream>
 
+#define LOG(msg) std::cout << msg << endl;
+
 #else
 
 #include <Arduino.h>
+
+// #define LOG(msg) /* Serial.printf(msg) */
+#define LOG(msg)  Serial.printf(msg); Serial.printf("\n")
 
 #endif
 

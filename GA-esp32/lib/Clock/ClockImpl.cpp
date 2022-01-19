@@ -43,7 +43,6 @@ private:
 };
 
 ClockImpl::ClockImpl() :
-//		PeriodicTask("Clock", CLOCK_PERIOD_IN_SECS * 1000, 4000),
 		now(Time24Factory::create(20, 0, 55)), gsm(nullptr), updateDue(0) {
 }
 
@@ -61,11 +60,11 @@ void ClockImpl::tick() {
 	updateNow();
 
 #ifdef GA_POSIX
-	std::cout << "Tick ";
+	// LOG("Tick ");
 	std::cout << n << std::endl;
 #else
-	Serial.print("Tick ");
-	Serial.println(n.c_str());
+	// LOG("Tick ");
+	LOG(n.c_str());
 #endif
 }
 

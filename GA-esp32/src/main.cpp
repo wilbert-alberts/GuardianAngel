@@ -19,6 +19,8 @@
 #include <IActivityDetector.hpp>
 #include <IButton.hpp>
 #include <IConfigProvider.hpp>
+#include <PeriodicTask.hpp>
+#include <platform.hpp>
 #include <iostream>
 #include <memory>
 
@@ -40,7 +42,7 @@ static std::shared_ptr<IActivityDetector> activityDetector;
 #include <unistd.h>
 
 int main() {
-	std::cout << "Starting." << std::endl;
+	LOG("Starting.");
 
 	doWiring();
 
@@ -52,8 +54,8 @@ int main() {
 
 	sleep(10);
 
-	std::cout << "Stopping." << std::endl;
-	std::cout << "Stopped." << std::endl;
+	LOG("Stopping.");
+	LOG("Stopped.");
 
 	return 0;
 }
@@ -65,15 +67,34 @@ int main() {
 void setup()
 {
 	Serial.begin(115200);
-	Serial.println("Starting.");
+	LOG("Starting.");
 
 	doWiring();
 
+	// Create active processes
+	auto clockTask = timeProvider->createTask();
+	clockTask->startTask();
+
+	auto helpButtonTask = helpBtn->createTask();
+	helpButtonTask->startTask();
+
+	auto activityDetectorTask = activityDetector->createTask();
+	activityDetectorTask->startTask();
+
 	vTaskDelay(10 * 1000);
 
-	Serial.println("Stopping.");
-	Serial.println("Stopped.");
+	LOG("Stopping.");
+
+	clockTask->endTask();
+	delete clockTask;
+
+	helpButtonTask->endTask();
+	delete helpButtonTask;
+
+	activityDetectorTask->endTask();
+	delete activityDetectorTask;
 	
+	LOG("Stopped.");
 }
 
 void loop()
@@ -84,7 +105,7 @@ void loop()
 
 void doWiring() {
 	// Do all wiring
-	std::cout << "Wiring." << std::endl;
+	LOG("Wiring.");
 	configProvider = ConfigFactory::create();
 
 	gsm = GSMFactory::create();
@@ -93,7 +114,6 @@ void doWiring() {
 	timeProvider->setGSM(gsm);
 
 	activityDetector = ActivityDetectorFactory::create(readPIR);
-
 	helpBtn = HelpButtonFactory::create(readHelpBtn);
 
 	alarmProcessor = AlarmStationFactory::create();
@@ -107,7 +127,7 @@ void doWiring() {
 	angelMgr->setAlarmProcessor(alarmProcessor);
 	angelMgr->setTimeProvider(timeProvider);
 
-	std::cout << "Wiring finished." << std::endl;
+	LOG("Wiring finished.");
 
 }
 

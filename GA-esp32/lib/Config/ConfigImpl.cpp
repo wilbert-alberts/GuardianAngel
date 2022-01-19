@@ -24,6 +24,12 @@ std::shared_ptr<IConfigProvider> create() {
 
 #include <fstream>
 
+ConfigImpl::ConfigImpl() {
+}
+
+ConfigImpl::~ConfigImpl() {
+}
+
 void ConfigImpl::loadProperties(std::string& props) {
 	std::ifstream of("GA.ini");
 
@@ -44,6 +50,13 @@ void ConfigImpl::saveProperties(const std::string& props) {
 
 #include <EEPROM.h>
 
+ConfigImpl::ConfigImpl() {
+	EEPROM.begin(4096);
+}
+
+ConfigImpl::~ConfigImpl() {
+	EEPROM.end();
+}
 
 void ConfigImpl::loadProperties(std::string& props) {
 	String sprops = EEPROM.readString(0);
