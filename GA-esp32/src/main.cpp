@@ -39,7 +39,6 @@ int main() {
 
 	// Do all wiring
 	auto configProvider = ConfigFactory::create();
-	configProvider->loadProperties();
 
 	auto gsm = GSMFactory::create();
 

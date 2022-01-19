@@ -15,14 +15,16 @@
 #include <IMessage.hpp>
 #include <IMessageProvider.hpp>
 #include <ITimeProvider.hpp>
-#include <LoadableAngel.hpp>
 #include <PeriodicTask.hpp>
 #include <stddef.h>
-#include <SaveableAngel.hpp>
 #include <Time24.hpp>
+#include "WatchInterval.hpp"
 #include <algorithm>
 #include <iterator>
 #include <stdlib.h>
+#include "ArduinoJson-v6.19.1.h"
+
+
 
 PeriodicTask *AngelMgrImpl::createTask()
 {
@@ -229,41 +231,6 @@ void AngelMgrImpl::unsubscribeAngel(const std::string &phonenr,
 	saveConfig();
 }
 
-/*
-void AngelMgrImpl::saveConfig() {
-	static char buffer[40];
-	if (configProvider) {
-		itoa((int)(angels.size()), buffer, 10);
-		std::string nrAngelsAsString(buffer);
-		configProvider->putProperty("nr_angels", nrAngelsAsString);
-		for (size_t i = 0; i < angels.size(); i++) {
-			auto sa = new SaveableAngel(angels[i], configProvider, i);
-			sa->save();
-		}
-		configProvider->saveProperties();
-	}
-}
-
-void AngelMgrImpl::loadConfig() {
-	if (configProvider) {
-		auto nrAngelsStr = configProvider->getProperty("nr_angels");
-		int nrAngels = 0;
-		if (nrAngelsStr != nullptr) {
-			nrAngels = atoi(nrAngelsStr->c_str());
-		}
-		for (int i = 0; i < nrAngels; i++) {
-			auto newLAngel = new LoadableAngel(configProvider, i);
-			auto newAngel = newLAngel->toAngel();
-			angels.push_back(newAngel);
-		}
-	}
-}
-*/
-
-#include "ArduinoJson-v6.19.1.h"
-
-#include "WatchInterval.hpp"
-#include "Time24.hpp"
 
 void AngelMgrImpl::saveConfig()
 {
@@ -278,7 +245,7 @@ void AngelMgrImpl::saveConfig()
 		ang["phoneNr"] = angels[i]->getPhoneNr();
 		ang["nrIntervals"] = angels[i]->getNrIntervals();
 		ang.createNestedArray("intervals");
-		for (size_t j = 0; j < angels[i]->getNrIntervals(); j++)
+		for (int j = 0; j < angels[i]->getNrIntervals(); j++)
 		{
 			JsonObject iv = ang.createNestedObject("interval");
 			std::shared_ptr<WatchInterval> interval = angels[i]->getInterval(j);
@@ -311,13 +278,13 @@ void AngelMgrImpl::loadConfig()
 		deserializeJson(doc, props);
 
 		int nrAngels = doc["nrAngels"];
-		for (size_t i = 0; i < nrAngels; i++)
+		for (int i = 0; i < nrAngels; i++)
 		{
 			auto ang = doc["angels"][i];
 			std::string phoneNr = ang["phoneNr"];
 
 			int nrIntervals = ang["nrIntervals"];
-			for (size_t j = 0; j < nrIntervals; j++)
+			for (int j = 0; j < nrIntervals; j++)
 			{
 				auto iv = ang["intervals"];
 				std::string start = iv["start"];

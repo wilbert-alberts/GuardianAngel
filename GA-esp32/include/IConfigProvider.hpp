@@ -15,13 +15,6 @@ class IConfigProvider
 public:
 	IConfigProvider() {};
 	virtual ~IConfigProvider() {};
-    virtual void clear()=0;
-    virtual void loadProperties()=0;
-    virtual void saveProperties()=0;
-
-    virtual void putProperty(const std::string& id, const std::string& value)=0;
-
-    virtual const std::string* getProperty(const std::string& id)=0;
 
     virtual void loadProperties(std::string& props)=0;
     virtual void saveProperties(const std::string& props)=0;
