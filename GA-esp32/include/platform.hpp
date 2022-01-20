@@ -22,11 +22,20 @@
 
 #else
 
+#ifdef CORE_DEBUG_LEVEL
+#undef CORE_DEBUG_LEVEL
+#endif
+
+#define CORE_DEBUG_LEVEL 5
+#define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
+
 #include <Arduino.h>
 
 // #define LOG(msg) /* Serial.printf(msg) */
-#define LOG(msg)  Serial.printf(msg); Serial.printf("\n")
-
+// #define LOG(msg)  Serial.printf(msg); Serial.printf("\n")
+#define LOG(msg)  ESP_LOGD("GA", msg);
+#define LOG_ENTRY LOG("> ()")
+#define LOG_EXIT LOG("< ()")
 #endif
 
 

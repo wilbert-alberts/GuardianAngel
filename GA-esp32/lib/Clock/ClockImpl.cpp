@@ -14,12 +14,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
-
-#ifdef GA_POSIX
-#else
-#include <Arduino.h>
-#endif
-
+#include <platform.hpp>
 
 class ClockImpl: public Clock, public ITicking {
 	const int ALIGN_WITH_GSM_PERIOD_IN_SECS = (60 * 30); // Every 30 mins
@@ -64,7 +59,7 @@ void ClockImpl::tick() {
 	std::cout << n << std::endl;
 #else
 	// LOG("Tick ");
-	LOG(n.c_str());
+	ESP_LOGD("GA","%s", n.c_str());
 #endif
 }
 

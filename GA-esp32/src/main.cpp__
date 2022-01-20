@@ -1,0 +1,29 @@
+#ifdef CORE_DEBUG_LEVEL
+#undef CORE_DEBUG_LEVEL
+#endif
+
+#define CORE_DEBUG_LEVEL 5
+#define LOG_LOCAL_LEVEL ESP_LOG_DEBUG
+
+#include <Arduino.h>
+
+
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Starting"); // will be shown in the terminal
+  Serial.setDebugOutput(true);
+
+  esp_log_level_set("*", ESP_LOG_VERBOSE);
+  ESP_LOGD("EXAMPLE", "This doesn't show");
+
+  log_v("Verbose");
+  log_d("Debug");
+  log_i("Info");
+  log_w("Warning"); 
+  log_e("Error");
+}
+
+void loop() {
+  // nothing to do
+}

@@ -62,7 +62,6 @@ int main() {
 
 #else
 
-#include <Arduino.h>
 
 void setup()
 {

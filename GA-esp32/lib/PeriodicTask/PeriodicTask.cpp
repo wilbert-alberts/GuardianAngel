@@ -8,18 +8,18 @@
 PeriodicTask::PeriodicTask(const char *taskName,
 		std::shared_ptr<ITicking> _ticker, int periodInMs, int stackSize) :
 		ActiveTask(taskName, stackSize), ticker(_ticker), period(periodInMs) {
-	LOG("> PeriodicTask()");
-	LOG("< PeriodicTask()");
+	LOG_ENTRY
+	LOG_EXIT
 }
  
 PeriodicTask::~PeriodicTask()
 {
-    LOG("> PeriodicTask::~PeriodicTask()");
-    LOG("< PeriodicTask::~PeriodicTask()");
+	LOG_ENTRY
+	LOG_EXIT
 }
 
 void PeriodicTask::endTask() {
-	LOG("> PeriodicTask::endTask()");
+	LOG_ENTRY
 #ifdef GA_POSIX
 #else
 	xSemaphoreTake(continueRunning,0);
@@ -28,7 +28,7 @@ void PeriodicTask::endTask() {
 	vSemaphoreDelete(terminated);
 #endif
 	ActiveTask::endTask();
-	LOG("< PeriodicTask::endTask()");
+	LOG_EXIT
 }
 
 void PeriodicTask::task() {
