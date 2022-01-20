@@ -17,8 +17,9 @@
 #include <signal.h>
 #include <unistd.h>
 #include <iostream>
+#include <semaphore.h>
 
-#define LOG(msg) std::cout << msg << endl;
+#define LOG(msg) std::cout << msg << std::endl;
 
 #else
 

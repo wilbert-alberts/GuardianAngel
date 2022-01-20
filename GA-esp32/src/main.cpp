@@ -48,15 +48,28 @@ int main() {
 
 	// Create active processes
 	auto clockTask = timeProvider->createTask();
+	clockTask->startTask();
+
 	auto helpButtonTask = helpBtn->createTask();
+	helpButtonTask->startTask();
+
 	auto activityDetectorTask = activityDetector->createTask();
-	auto angelMgrTask = angelMgr->createTask();
+	activityDetectorTask->startTask();
 
 	sleep(10);
 
 	LOG("Stopping.");
-	LOG("Stopped.");
 
+	clockTask->endTask();
+	delete clockTask;
+
+	helpButtonTask->endTask();
+	delete helpButtonTask;
+
+	activityDetectorTask->endTask();
+	delete activityDetectorTask;
+
+	LOG("Stopped.");
 	return 0;
 }
 
