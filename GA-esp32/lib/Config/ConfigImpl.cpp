@@ -11,6 +11,7 @@
 #include <sstream>
 #include <utility>
 
+#include <platform.hpp>
 
 namespace ConfigFactory {
 
@@ -65,7 +66,10 @@ void ConfigImpl::loadProperties(std::string& props) {
 }
 
 void ConfigImpl::saveProperties(const std::string& props) {
+	LOG("> ConfigImpl::saveProperties()");
+	Serial.printf(" props: %s\n", props.c_str());
 	EEPROM.writeString(0, props.c_str());
+	LOG("< ConfigImpl::saveProperties()");
 }
 
 #endif

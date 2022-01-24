@@ -64,7 +64,7 @@ void ClockImpl::tick() {
 	std::cout << n << std::endl;
 #else
 	// LOG("Tick ");
-	LOG(n.c_str());
+	// LOG(n.c_str());
 #endif
 }
 

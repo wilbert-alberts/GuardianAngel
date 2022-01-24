@@ -1,0 +1,119 @@
+// Please select the corresponding model
+
+// #define SIM800L_IP5306_VERSION_20190610
+// #define SIM800L_AXP192_VERSION_20200327
+#define SIM800C_AXP192_VERSION_20200609
+// #define SIM800L_IP5306_VERSION_20200811
+
+#include <Arduino.h>
+#include "utilities.h"
+#include "BensSim.hpp"
+#include "BensMessage.hpp"
+#include "DateTime.hpp"
+
+#define DEBUG
+
+// Set serial for debug console (to the Serial Monitor, default speed 115200)
+
+#define SerialMon Serial
+
+
+char code[] = "2881";
+
+char addr[] = "+31624564480";
+char msg[] = "Not only completely peppernuts but also totally over the reds!";
+
+//--------------------------
+void testDateTime ()
+{
+
+    std::string f1 ("2021,12,24,13,10,45,\"+4\",0");
+    std::string f2 ("21/12/31,22:38:16+04");
+    std::string f3 ("21/12/31,22:38:16");
+    std::string f4 ("23 mAr 2021 15:12:34+04");
+    std::string f5 ("15:12:34+04");
+    std::string f6 ("23 mAr 2021");
+    std::string f7 ("12:34:56+04");
+    std::string f8 ("12:34");
+
+    std::string *fs [] = {&f1, &f2, &f3, &f4, &f5, &f6, &f7, &f8};
+    std::shared_ptr <DateTime> dts [8];
+
+    Serial.printf ("testDateTime\n");
+
+    for (int i = 0; i < sizeof (fs) / sizeof (fs[0]); i++) {
+        Serial.printf ("Creating from f[%d]: '%s'...\n", i+1, fs[i] -> c_str ());
+        DateTime dt = DateTime (*fs[i]);
+
+        Serial.printf ("string = %s\n", dt.toString ().c_str ());
+    }
+}
+
+void dump (BensMessage *bmp, int sqn) 
+{
+    Serial.printf ("\nMessage %d:\n", sqn);
+
+    Serial.printf ("Message ID:   %2d\n", bmp -> getMessageID ());
+    Serial.printf ("isValid:      %s\n",  bmp -> isValid ()? "yes":"no");
+    const DateTime& sentat = bmp -> getSentAt ();
+    int dd,mm,yy,h,m,s;
+    sentat.getYMD (yy,mm,dd); sentat.getHMS (h, m, s);
+    Serial.printf ("Sent at       %d %d %d, %02d:%02d:%02d\n", 
+                                  dd,mm,yy, h,m,s);
+    Serial.printf ("  by          %s\n", bmp -> getSender ().c_str ());
+    Serial.printf ("Message:      '%s'\n", bmp -> getBody ().c_str());
+    Serial.printf ("Action:       '%s'\n", bmp -> getAction ().c_str ());
+    Serial.printf ("Period:       %s-%s\n", bmp -> getStart ().c_str (), bmp -> getEnd ().c_str ());
+}
+
+
+void dumpBensMessageRx() {
+	std::string timeRx = "[0-2]?[0-9]:[0-5][0-9]";
+	std::string actionRx = "\\s*(subscribe|unsubscribe)\\s*";
+	std::string startRx = "start\\s+(" + timeRx + ")";
+	std::string endRx = "end\\s+(" + timeRx + ")";
+	std::string intervalRx = "(" + timeRx + ")\\s*-\\s*(" + timeRx + ")";
+	std::string timingRx = "((" + startRx + "\\s+" + endRx + ")|(" + intervalRx
+			+ "))";
+	std::string msgRx = "(" + actionRx + ")?(" + timingRx + ")?";
+    Serial.printf(msgRx.c_str());
+}
+
+
+
+//-------------------------
+// the Arduino main setup
+void setup()
+{
+    // Set console baud rate
+    SerialMon.begin(115200);
+
+   // testDateTime (); // this one fails
+
+    dumpBensMessageRx();
+
+    BensSim bs (&SIM, code);
+  
+    bs.begin ();
+
+    //SIM.clock (GET);
+ 
+    std::list <std::shared_ptr <BensMessage>> messageList = bs.getMessages ();
+
+    int i = 0; 
+    for (std::list<std::shared_ptr <BensMessage>>::iterator it=messageList.begin(); it != messageList.end(); ++it) {
+        BensMessage *bmp = it -> get();
+        dump (bmp, ++i);
+    }
+
+
+    SerialMon.printf ("%d messages in list\n\n", i);
+    SerialMon.print("Starting loop\n");
+
+}
+
+void loop()
+{
+    SIM.directSerialMonitor();
+}
+
