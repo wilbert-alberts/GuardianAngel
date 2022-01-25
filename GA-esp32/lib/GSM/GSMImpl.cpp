@@ -66,27 +66,27 @@ GSMImpl::GSMImpl() {
 }
 
 std::vector<MessageID> GSMImpl::getMessageIDs() {
-	LOG("> GSMImpl::getMessageIDs()");
+	LOG_ENTRY();
 	std::vector<MessageID> result;
 
 	// Retrieve messages from BensSim and store in messages
 	auto bensMessages = bs.getMessages();
-	LOG("= GSMImpl::getMessageIDs()  - bensMessages retrieved");
+	LOG("bensMessages retrieved");
 
 	messages.clear();
 	std::for_each(bensMessages.begin(), bensMessages.end(), [&](std::shared_ptr<BensMessage> bm){
 		auto myMsg = MessageFactory::createMessage(bm->getMessageID(), bm->getSender(), bm->getBody());
 		messages.push_back(myMsg);
 	});
-	LOG("= GSMImpl::getMessageIDs() - bensMessages transformed in myMessages");
+	LOG("bensMessages transformed in myMessages");
 
 	// Extract message ids
 	std::for_each(messages.begin(), messages.end(),
 			[&](std::shared_ptr<IMessage> m) {
 				result.push_back(m->getMessageID());
 			});
-	LOG("= GSMImpl::getMessageIDs() - message ids extracted");
-	LOG("< GSMImpl::getMessageIDs()");
+	LOG("message ids extracted");
+	LOG_EXIT();
 	return result;
 
 }

@@ -5,8 +5,8 @@
 ActiveTask::ActiveTask(const char *tn, int ss):
 taskName(tn), stackSize(ss)
 {
-	LOG_ENTRY
-	LOG_EXIT
+	LOG_ENTRY();
+	LOG_EXIT();
 }
 
 ActiveTask::~ActiveTask()
@@ -16,7 +16,7 @@ ActiveTask::~ActiveTask()
 
 void ActiveTask::startTask() 
 {
-	LOG_ENTRY
+	LOG_ENTRY();
 #ifdef GA_POSIX
 
     pthread_create(&thread, NULL, ActiveTask::_task, this);
@@ -32,18 +32,18 @@ void ActiveTask::startTask()
         &taskHandle);
 
 #endif
-	LOG_EXIT
+	LOG_EXIT();
 }
 
 void ActiveTask::endTask() 
 {
-    LOG_ENTRY
+    LOG_ENTRY();
 #ifdef GA_POSIX
     pthread_kill(thread, SIGTERM);
 #else
     vTaskDelete(taskHandle);
 #endif
-	LOG_EXIT
+	LOG_EXIT();
 }
 
 #ifdef GA_POSIX

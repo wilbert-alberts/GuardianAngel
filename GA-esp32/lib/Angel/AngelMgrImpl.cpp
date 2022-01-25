@@ -87,15 +87,15 @@ void AngelMgrImpl::setConfigProvider(
 
 void AngelMgrImpl::tick()
 {
-	LOG("> AngelMgrImpl::tick()");
+	LOG_ENTRY();
 	processAngels();
 	processMessages();
-	LOG("< AngelMgrImpl::tick()");
+	LOG_EXIT();
 }
 
 void AngelMgrImpl::processAngels()
 {
-	LOG("> AngelMgrImpl::processAngels()");
+	LOG_ENTRY();
 	// Retrieve time
 	auto now = clock->getTime();
 	// Retrieve and clear activations
@@ -127,12 +127,12 @@ void AngelMgrImpl::processAngels()
 				alarmedAngels.push_back(a);
 			} });
 	}
-	LOG("< AngelMgrImpl::processAngels()");
+	LOG_EXIT();
 }
 
 void AngelMgrImpl::processMessages()
 {
-	LOG("> AngelMgrImpl::processMessages()");
+	LOG_ENTRY();
 
 	// Retrieve messages
 	auto msgs = messageProvider->getMessageIDs();
@@ -145,12 +145,12 @@ void AngelMgrImpl::processMessages()
 		// Regards valid or not, remove message
 		messageProvider->delMessage(msg->getMessageID()); 
 	});
-	LOG("< AngelMgrImpl::processMessages()");
+	LOG_EXIT();
 }
 
 void AngelMgrImpl::processMessage(std::shared_ptr<IMessage> msg)
 {
-	LOG(">  AngelMgrImpl::processMessage()");
+	LOG_ENTRY();
 	if (msg->getAction() == "subscribe")
 	{
 		subscribeAngel(msg->getSender(), msg->getStart(), msg->getEnd(), true);
@@ -160,7 +160,7 @@ void AngelMgrImpl::processMessage(std::shared_ptr<IMessage> msg)
 		unsubscribeAngel(msg->getSender(), msg->getStart(), msg->getEnd(),
 						 true);
 	}
-	LOG("<  AngelMgrImpl::processMessage()");
+	LOG_EXIT();
 }
 
 std::shared_ptr<Angel> AngelMgrImpl::findAngel(const std::string &phoneNr)
@@ -204,7 +204,7 @@ void AngelMgrImpl::delAngel(const std::string &phoneNr)
 void AngelMgrImpl::subscribeAngel(const std::string &phonenr,
 								  const std::string &start, const std::string &end, bool save)
 {
-	LOG("> AngelMgrImpl::subscribeAngel()");
+	LOG_ENTRY();
 	auto angel = findAngel(phonenr);
 
 	if (angel == nullptr)
@@ -216,7 +216,7 @@ void AngelMgrImpl::subscribeAngel(const std::string &phonenr,
 
 	angel->addInterval(start, end);
 	saveConfig();
-	LOG("< AngelMgrImpl::subscribeAngel()");
+	LOG_EXIT();
 }
 
 void AngelMgrImpl::unsubscribeAngel(const std::string &phonenr,

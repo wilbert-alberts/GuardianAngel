@@ -16,9 +16,9 @@ class BensSim {
     void begin ();
     void loop ();
     std::list <std::shared_ptr <BensMessage>> getMessages () {
-       LOG("> BensSim::getMessages()");
+       LOG_ENTRY();
        getAllSMSes();
-       LOG("< BensSim::getMessages()");
+       LOG_EXIT();
        return messages;
        }
 
