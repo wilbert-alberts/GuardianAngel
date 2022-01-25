@@ -59,7 +59,7 @@ void ClockImpl::tick() {
 	std::cout << n << std::endl;
 #else
 	// LOG("Tick ");
-	ESP_LOGD("GA","%s", n.c_str());
+	// ESP_LOGD("GA","%s", n.c_str());
 #endif
 }
 

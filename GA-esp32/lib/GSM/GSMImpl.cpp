@@ -7,6 +7,7 @@
 
 #include <GSM.hpp>
 #include <IMessage.hpp>
+#include <MessageFactory.hpp>
 #include <Time24.hpp>
 #include <Time24Factory.hpp>
 #include <algorithm>
@@ -15,11 +16,17 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "platform.hpp"
 
 #ifdef GA_POSIX
 #include <bits/types/struct_tm.h>
 #include <chrono>
 #include <time.h>
+
+#else
+
+#include <SIM800.h>
+#include <BensSim.hpp>
 
 #endif
 
@@ -28,7 +35,7 @@ public:
 	GSMImpl();
 	~GSMImpl() {
 	}
-	virtual std::vector<MessageID> getMessageIDs() const;
+	virtual std::vector<MessageID> getMessageIDs();
 	virtual std::shared_ptr<IMessage> getMessage(const MessageID mid) const;
 	virtual void delMessage(const MessageID mid);
 	virtual void sendMessage(const std::string &phoneNr, const std::string& msg);
@@ -36,7 +43,14 @@ public:
 
 private:
 	std::vector<std::shared_ptr<IMessage>> messages;
+	static BensSim bs;
+	static boolean bensSimBeginCalled;
 };
+
+// TODO: find way to configure PIN 
+char bensPin[]="2881";
+BensSim GSMImpl::bs (&SIM, bensPin);
+boolean GSMImpl::bensSimBeginCalled(false);
 
 namespace GSMFactory {
 std::shared_ptr<GSM> create() {
@@ -45,17 +59,36 @@ std::shared_ptr<GSM> create() {
 }
 
 GSMImpl::GSMImpl() {
+	if (!bensSimBeginCalled) {
+		bs.begin();
+		bensSimBeginCalled = true;
+	}
 }
 
-std::vector<MessageID> GSMImpl::getMessageIDs() const {
-
+std::vector<MessageID> GSMImpl::getMessageIDs() {
+	LOG("> GSMImpl::getMessageIDs()");
 	std::vector<MessageID> result;
 
-	std::transform(messages.begin(), messages.end(), result.begin(),
-			[](std::shared_ptr<IMessage> m) {
-				return m->getMessageID();
+	// Retrieve messages from BensSim and store in messages
+	auto bensMessages = bs.getMessages();
+	LOG("= GSMImpl::getMessageIDs()  - bensMessages retrieved");
+
+	messages.clear();
+	std::for_each(bensMessages.begin(), bensMessages.end(), [&](std::shared_ptr<BensMessage> bm){
+		auto myMsg = MessageFactory::createMessage(bm->getMessageID(), bm->getSender(), bm->getBody());
+		messages.push_back(myMsg);
+	});
+	LOG("= GSMImpl::getMessageIDs() - bensMessages transformed in myMessages");
+
+	// Extract message ids
+	std::for_each(messages.begin(), messages.end(),
+			[&](std::shared_ptr<IMessage> m) {
+				result.push_back(m->getMessageID());
 			});
+	LOG("= GSMImpl::getMessageIDs() - message ids extracted");
+	LOG("< GSMImpl::getMessageIDs()");
 	return result;
+
 }
 
 std::shared_ptr<IMessage> GSMImpl::getMessage(const MessageID mid) const {

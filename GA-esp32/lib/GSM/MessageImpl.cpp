@@ -85,7 +85,8 @@ std::regex MessageImpl::initMessageRx() {
 	std::string intervalRx = "(" + timeRx + ")\\s*-\\s*(" + timeRx + ")";
 	std::string timingRx = "((" + startRx + "\\s+" + endRx + ")|(" + intervalRx
 			+ "))";
-	std::string msgRx = "(" + actionRx + ")?(" + timingRx + ")?";
+	std::string msgRx = "\\s*(" + actionRx + ")?(" + timingRx + ")?\\s*";
+
 	return std::regex(msgRx);
 }
 

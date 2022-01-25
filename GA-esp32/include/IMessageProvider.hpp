@@ -16,7 +16,7 @@
 class IMessageProvider {
 public:
 	virtual ~IMessageProvider(){};
-	virtual std::vector<MessageID> getMessageIDs() const = 0;
+	virtual std::vector<MessageID> getMessageIDs() = 0;
 	virtual std::shared_ptr<IMessage > getMessage(const MessageID id) const = 0;
 	virtual void delMessage(const MessageID id) = 0;
 

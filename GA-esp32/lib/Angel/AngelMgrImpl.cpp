@@ -28,7 +28,7 @@
 
 PeriodicTask *AngelMgrImpl::createTask()
 {
-	return new PeriodicTask("angelMgr", std::shared_ptr<ITicking>(this), 60 * 1000, 4000);
+	return new PeriodicTask("angelMgr", std::shared_ptr<ITicking>(this), 60 * 1000, 8192);
 }
 void AngelMgrImpl::resetAngels()
 {
@@ -87,12 +87,15 @@ void AngelMgrImpl::setConfigProvider(
 
 void AngelMgrImpl::tick()
 {
+	LOG("> AngelMgrImpl::tick()");
 	processAngels();
 	processMessages();
+	LOG("< AngelMgrImpl::tick()");
 }
 
 void AngelMgrImpl::processAngels()
 {
+	LOG("> AngelMgrImpl::processAngels()");
 	// Retrieve time
 	auto now = clock->getTime();
 	// Retrieve and clear activations
@@ -124,25 +127,30 @@ void AngelMgrImpl::processAngels()
 				alarmedAngels.push_back(a);
 			} });
 	}
+	LOG("< AngelMgrImpl::processAngels()");
 }
 
 void AngelMgrImpl::processMessages()
 {
+	LOG("> AngelMgrImpl::processMessages()");
+
 	// Retrieve messages
 	auto msgs = messageProvider->getMessageIDs();
 	// Process messages one by one
-	std::for_each(msgs.begin(), msgs.end(), [&](MessageID mid)
-				  {
+	std::for_each(msgs.begin(), msgs.end(), [&](MessageID mid) {
 		auto msg = messageProvider->getMessage(mid);
 		if (msg->isValid()) {
 			processMessage(msg);
 		}
 		// Regards valid or not, remove message
-		messageProvider->delMessage(msg->getMessageID()); });
+		messageProvider->delMessage(msg->getMessageID()); 
+	});
+	LOG("< AngelMgrImpl::processMessages()");
 }
 
 void AngelMgrImpl::processMessage(std::shared_ptr<IMessage> msg)
 {
+	LOG(">  AngelMgrImpl::processMessage()");
 	if (msg->getAction() == "subscribe")
 	{
 		subscribeAngel(msg->getSender(), msg->getStart(), msg->getEnd(), true);
@@ -152,6 +160,7 @@ void AngelMgrImpl::processMessage(std::shared_ptr<IMessage> msg)
 		unsubscribeAngel(msg->getSender(), msg->getStart(), msg->getEnd(),
 						 true);
 	}
+	LOG("<  AngelMgrImpl::processMessage()");
 }
 
 std::shared_ptr<Angel> AngelMgrImpl::findAngel(const std::string &phoneNr)
@@ -195,7 +204,7 @@ void AngelMgrImpl::delAngel(const std::string &phoneNr)
 void AngelMgrImpl::subscribeAngel(const std::string &phonenr,
 								  const std::string &start, const std::string &end, bool save)
 {
-
+	LOG("> AngelMgrImpl::subscribeAngel()");
 	auto angel = findAngel(phonenr);
 
 	if (angel == nullptr)
@@ -207,6 +216,7 @@ void AngelMgrImpl::subscribeAngel(const std::string &phonenr,
 
 	angel->addInterval(start, end);
 	saveConfig();
+	LOG("< AngelMgrImpl::subscribeAngel()");
 }
 
 void AngelMgrImpl::unsubscribeAngel(const std::string &phonenr,
@@ -244,10 +254,10 @@ void AngelMgrImpl::saveConfig()
 		JsonObject ang = angs.createNestedObject();
 		ang["phoneNr"] = angels[i]->getPhoneNr();
 		ang["nrIntervals"] = angels[i]->getNrIntervals();
-		ang.createNestedArray("intervals");
+		JsonArray ivs = ang.createNestedArray("intervals");
 		for (int j = 0; j < angels[i]->getNrIntervals(); j++)
 		{
-			JsonObject iv = ang.createNestedObject("interval");
+			JsonObject iv = ivs.createNestedObject();
 			std::shared_ptr<WatchInterval> interval = angels[i]->getInterval(j);
 			std::shared_ptr<const Time24> start = interval->getStart();
 			std::shared_ptr<const Time24> end = interval->getEnd();
@@ -286,7 +296,7 @@ void AngelMgrImpl::loadConfig()
 			int nrIntervals = ang["nrIntervals"];
 			for (int j = 0; j < nrIntervals; j++)
 			{
-				auto iv = ang["intervals"];
+				auto iv = ang["intervals"][j];
 				std::string start = iv["start"];
 				std::string end = iv["end"];
 
