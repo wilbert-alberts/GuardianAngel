@@ -71,6 +71,7 @@ std::shared_ptr<Time24> ClockImpl::getTime() const {
 
 void ClockImpl::setGSM(std::shared_ptr<GSM> _gsm) {
 	gsm = _gsm;
+	updateDue = 0;
 	updateNow();
 }
 

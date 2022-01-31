@@ -93,15 +93,15 @@ void setup()
 	auto activityDetectorTask = activityDetector->createTask();
 	activityDetectorTask->startTask();
 
-	auto angelMgrTask = angelMgr->createTask();
-	angelMgrTask->startTask();
+	// auto angelMgrTask = angelMgr->createTask();
+	// angelMgrTask->startTask();
 
 	vTaskDelay(120 * 1000);
 
 	LOG("Stopping.");
 
-	angelMgrTask->endTask();
-	delete angelMgrTask;
+	// angelMgrTask->endTask();
+	// delete angelMgrTask;
 
 	activityDetectorTask->endTask();
 	delete activityDetectorTask;

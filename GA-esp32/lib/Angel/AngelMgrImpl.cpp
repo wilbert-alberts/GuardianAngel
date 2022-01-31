@@ -49,6 +49,8 @@ void AngelMgrImpl::btnPressed()
 		// Send alarm to every angel
 		std::for_each(angels.begin(), angels.end(), [&](std::shared_ptr<Angel> a)
 					  { alarmProcessor->sendAlarm(a->getPhoneNr()); });
+
+		//  TODO: check whether this is still needed
 		std::for_each(alarmedAngels.begin(), alarmedAngels.end(), [&](std::shared_ptr<Angel> a)
 					  { alarmProcessor->sendAlarm(a->getPhoneNr()); });
 	}
@@ -204,7 +206,7 @@ void AngelMgrImpl::delAngel(const std::string &phoneNr)
 void AngelMgrImpl::subscribeAngel(const std::string &phonenr,
 								  const std::string &start, const std::string &end, bool save)
 {
-	LOG_ENTRY();
+	LOG_ENTRY("angel: %s, start: %s, end: %s", phonenr.c_str(), start.c_str(), end.c_str());
 	auto angel = findAngel(phonenr);
 
 	if (angel == nullptr)
@@ -215,7 +217,8 @@ void AngelMgrImpl::subscribeAngel(const std::string &phonenr,
 	}
 
 	angel->addInterval(start, end);
-	saveConfig();
+	if (save)
+		saveConfig();
 	LOG_EXIT();
 }
 
@@ -277,6 +280,7 @@ void AngelMgrImpl::saveConfig()
 
 void AngelMgrImpl::loadConfig()
 {
+	LOG_ENTRY();
 	angels.clear();
 
 	if (configProvider)
@@ -304,4 +308,5 @@ void AngelMgrImpl::loadConfig()
 			}
 		}
 	}
+	LOG_EXIT();
 }

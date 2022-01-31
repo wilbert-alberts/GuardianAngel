@@ -23,7 +23,7 @@
 //#include <avr/pgmspace.h>                       // All AT commands are stored in PROGMEM to unburden the SRAM and to make it possible to implement all 336 of them.
 #define P(str) PSTR(str)                       // Helper definition. P() does the same for char[] what F() does for String objects (stores them in PROGMEM).
 #define PSTR(s) (s)
-#define DEBUG                                   // Uncomment this line to enable Serial Monitor output from this library.
+#define NODEBUG                                   // Uncomment this line to enable Serial Monitor output from this library.
 
 #define DEF_RX_PIN  10                          // RX pin of Arduino. Must be connected to the TX pin of the SIM800 module.
 #define DEF_TX_PIN  11                          // TX pin of Arduino. Must be connected to the RX pin of the SIM800 module.

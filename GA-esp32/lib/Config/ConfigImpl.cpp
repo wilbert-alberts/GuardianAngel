@@ -51,23 +51,37 @@ void ConfigImpl::saveProperties(const std::string& props) {
 
 #include <EEPROM.h>
 
+#define CLEAR_EPROM
+
+#ifdef CLEAR_EPROM
+ConfigImpl::ConfigImpl() {
+	LOG_ENTRY();
+	EEPROM.begin(4096);
+	EEPROM.writeString(0, "");
+	LOG_EXIT();
+}
+#else
 ConfigImpl::ConfigImpl() {
 	EEPROM.begin(4096);
 }
+#endif
 
 ConfigImpl::~ConfigImpl() {
 	EEPROM.end();
 }
 
 void ConfigImpl::loadProperties(std::string& props) {
+	LOG_ENTRY();
 	String sprops = EEPROM.readString(0);
 	props.clear();
 	props = sprops.c_str();
+	LOG("props: %s", props.c_str());
+	LOG_EXIT();
 }
 
 void ConfigImpl::saveProperties(const std::string& props) {
 	LOG_ENTRY();
-	Serial.printf(" props: %s\n", props.c_str());
+	LOG("props: %s", props.c_str());
 	EEPROM.writeString(0, props.c_str());
 	LOG_EXIT();
 }

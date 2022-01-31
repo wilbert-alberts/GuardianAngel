@@ -59,10 +59,12 @@ std::shared_ptr<GSM> create() {
 }
 
 GSMImpl::GSMImpl() {
+	LOG_ENTRY();
 	if (!bensSimBeginCalled) {
 		bs.begin();
 		bensSimBeginCalled = true;
 	}
+	LOG_EXIT();
 }
 
 std::vector<MessageID> GSMImpl::getMessageIDs() {
@@ -117,6 +119,8 @@ void GSMImpl::sendMessage(const std::string &phoneNr, const std::string& msg) {
 }
 
 std::shared_ptr<Time24> GSMImpl::getTime() const {
+	LOG_ENTRY();
+
 	int h = 1;
 	int m = 2;
 	int s = 3;
@@ -131,8 +135,11 @@ std::shared_ptr<Time24> GSMImpl::getTime() const {
 	s = lt->tm_sec;
 
 #else
-
+	bs.getTime(h,m,s);
 #endif
-	return Time24Factory::create(h, m, s);
+
+	std::shared_ptr<Time24> result = Time24Factory::create(h, m, s);
+	LOG_EXIT("time: %s", result->toString().c_str());
+	return result;
 
 }
