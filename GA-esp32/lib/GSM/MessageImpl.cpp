@@ -5,6 +5,7 @@
  *      Author: wilbert
  */
 
+#include <platform.hpp>
 #include "IMessage.hpp"
 
 #include <regex>
@@ -55,29 +56,42 @@ MessageImpl::~MessageImpl() {
 }
 
 MessageID MessageImpl::getMessageID() const {
+	LOG_ENTRY();
+	LOG_EXIT("msgId: %d", messageID);
 	return messageID;
 }
 
 bool MessageImpl::isValid() const {
+	LOG_ENTRY();
+	LOG_EXIT("valid: %s", boolToString(valid));
 	return valid;
 }
 const std::string& MessageImpl::getSender() const {
+	LOG_ENTRY();
+	LOG_EXIT("sender: %s", sender.c_str());
 	return sender;
 }
 
 const std::string& MessageImpl::getAction() const {
+	LOG_ENTRY();
+	LOG_EXIT("action: %s", action.c_str());
 	return action;
 }
 
 const std::string& MessageImpl::getStart() const {
+	LOG_ENTRY();
+	LOG_EXIT("start: %s", start.c_str());
 	return start;
 }
 
 const std::string& MessageImpl::getEnd() const {
+	LOG_ENTRY();
+	LOG_EXIT("end: %s", end.c_str());
 	return end;
 }
 
 std::regex MessageImpl::initMessageRx() {
+	LOG_ENTRY();
 	std::string timeRx = "[0-2]?[0-9]:[0-5][0-9]";
 	std::string actionRx = "\\s*(subscribe|unsubscribe)\\s*";
 	std::string startRx = "start\\s+(" + timeRx + ")";
@@ -87,10 +101,12 @@ std::regex MessageImpl::initMessageRx() {
 			+ "))";
 	std::string msgRx = "\\s*(" + actionRx + ")?(" + timingRx + ")?\\s*";
 
+	LOG_EXIT("msg regex: %s: ", msgRx.c_str());
 	return std::regex(msgRx);
 }
 
 void MessageImpl::parseBody(const std::string &body) {
+	LOG_ENTRY("body: %s" , body.c_str());
 	auto m = std::smatch { };
 	bool regexMatch = std::regex_match(body, m, messageRx);
 
@@ -114,6 +130,7 @@ void MessageImpl::parseBody(const std::string &body) {
 			valid = true;
 		}
 	}
+	LOG_EXIT("start: %s, end: %s, action: %s", start.c_str(), end.c_str(), action.c_str());
 }
 
 

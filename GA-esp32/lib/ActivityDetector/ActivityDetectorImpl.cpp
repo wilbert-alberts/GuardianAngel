@@ -33,10 +33,14 @@ void ActivityDetectorImpl::tick() {
 }
 
 void ActivityDetectorImpl::clearActivity() {
+	LOG_ENTRY();
 	nrActivations = 0;
+	LOG_EXIT();
 }
 
 int ActivityDetectorImpl::getNrActivations() {
+	LOG_ENTRY();
+	LOG_EXIT("nrActivations: %d", nrActivations);
 	return nrActivations;
 }
 

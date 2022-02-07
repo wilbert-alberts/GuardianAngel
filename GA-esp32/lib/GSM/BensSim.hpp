@@ -20,6 +20,7 @@ public:
    {
       LOG_ENTRY();
       getAllSMSes();
+      deleteAllSMSes ();
       LOG_EXIT();
       return messages;
    }
@@ -39,6 +40,7 @@ private:
    bool handleSMSintro(char *line, char **status, char **sender, char **sentAt);
    void extractAllMessages(char *buffer);
    void getAllSMSes();
+   void deleteAllSMSes ();
 
    static bool initDone;
    static std::list<std::shared_ptr<BensMessage>> messages;

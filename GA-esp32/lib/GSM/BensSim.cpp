@@ -14,10 +14,6 @@
 #include "platform.hpp"
 #include "DateTime.hpp"
 
-#define DEBUG
-static bool debug = false;
-static bool debugSpecial = false;
-
 #include <SIM800.h>
 #include "BensSim.hpp"
 
@@ -29,7 +25,7 @@ static bool debugSpecial = false;
 #define LED_ON LOW
 #define LED_OFF HIGH
 
-#define SerialMon Serial // for debugging
+// #define SerialMon Serial // for debugging
 
 // Set serial for AT commands (to the module)
 #define SerialAT Serial1
@@ -46,6 +42,7 @@ std::list<std::shared_ptr<BensMessage>> BensSim::messages;
 //--------------------------------------
 BensSim::BensSim(SIM800 *sim, char *simPin)
 {
+    LOG_ENTRY("initDone: %s", boolToString(initDone));
     if (!initDone)
     {
         initDone = true;
@@ -55,25 +52,31 @@ BensSim::BensSim(SIM800 *sim, char *simPin)
         pSIM = sim;
         strncpy(pincode, simPin, 19);
     }
+    LOG_EXIT();
 }
 
 //---------------------------
 void BensSim::begin()
 {
+    LOG_ENTRY();
     setupGSM(pincode);
     // getAllSMSes ();
+    LOG_EXIT();
 }
 
 //---------------------------
 void BensSim::loop()
 {
+    LOG_ENTRY();
     getAllSMSes();
+    LOG_EXIT();
 }
 
 //-------------------------------------
 void BensSim::setupModem()
 // setup SIM800 chip
 {
+    LOG_ENTRY();
 #ifdef MODEM_RST
     // Keep reset high
     pinMode(MODEM_RST, OUTPUT);
@@ -99,6 +102,7 @@ void BensSim::setupModem()
 
     // give modem time to wake up
     delay(4000);
+    LOG_EXIT();
 }
 
 //-----------------------------
@@ -112,17 +116,14 @@ void BensSim::reportIfError(const char *msg)
 {
     if (pSIM->isError())
     {
-        SerialMon.print("-------ERROR--------\n");
-        SerialMon.print(msg);
-        SerialMon.print(" yielded: ");
-        SerialMon.print(pSIM->getBuffer());
-        SerialMon.print("\n--------------------\n");
+        LOG("----ERROR----\n%s yielded: %s \n--------------\n", msg, pSIM->getBuffer());
     }
 }
 
 //----------------------
 void BensSim::handleUnsolicitedMessage(char *buffer)
 {
+    LOG_ENTRY();
     char *token = strtok(buffer, "\r\n");
     while (token != NULL)
     {
@@ -148,13 +149,13 @@ void BensSim::handleUnsolicitedMessage(char *buffer)
 
         token = strtok(NULL, "\r\n");
     }
+    LOG_EXIT("callReady: %s, smsReady: %s", boolToString(callReady), boolToString(smsReady));
 }
 
 //--------------------
 void BensSim::getTime(int &h, int &m, int &s)
 {
     LOG_ENTRY();
-    int addDST = 0;
     pSIM->formatReply(true);
     LOG("Sending +CCLK");
     pSIM->clock(GET);
@@ -177,7 +178,7 @@ void BensSim::getTime(int &h, int &m, int &s)
     LOG("+CCLK reply received.");
 
     // token = strtok(NULL, "\r\n");
-    LOG_EXIT();
+    LOG_EXIT("hh:mm::ss", h, m, s);
 }
 
 //----------------------
@@ -222,7 +223,7 @@ bool BensSim::sayHello()
 
     if (i >= maxi)
     {
-        SerialMon.print("\n****** ERROR: sayHello: no OK reply\n");
+        LOG ("********* ERROR: sayHello: no OK reply\n");
         success = false;
     }
     pSIM->resetTimeout(); // normal timeout
@@ -238,6 +239,7 @@ bool BensSim::completelyReady()
 //---------------------------
 void BensSim::setupGSM(const char *pincode)
 {
+    LOG_ENTRY();
     // Set GSM module baud rate and UART pins
     pSIM->begin(115200, SERIAL_8N1, MODEM_RX, MODEM_TX);
 
@@ -263,11 +265,13 @@ void BensSim::setupGSM(const char *pincode)
 
     pSIM->smsFormat(SET, "1"); // expanded sms'es
     reportIfError("Set SMS format 1");
+    LOG_EXIT();
 }
 
 //---------------------------
 void BensSim::sendSMS(char *recipientNumber, char *sms)
 {
+    LOG_ENTRY("recipientNr: %s, msg: %s", recipientNumber, sms);
     const int maxLen = 153;
     char buffer[maxLen + 1];
     int nSMS = 0;
@@ -281,11 +285,13 @@ void BensSim::sendSMS(char *recipientNumber, char *sms)
         if (++nSMS > 3)
             break;
     }
+    LOG_EXIT();
 }
 
 //---------------------------
 void BensSim::storeMessage(char *sender, char *sentAt, char *message)
 {
+    LOG_ENTRY("sender: %s, sentAt: %s, message: %s", sender, sentAt, message);
     std::string stringSender(sender);
     std::string stringBody(message);
     std::string dtsIn(sentAt);
@@ -295,24 +301,11 @@ void BensSim::storeMessage(char *sender, char *sentAt, char *message)
     std::shared_ptr<BensMessage> thisMessage = BensMessageFactory::createBensMessage(highestID++, dtSentAt, stringSender, stringBody);
     messages.push_back(thisMessage);
 
-    static int messageNbr = 0;
+    std::string dts = dtSentAt.toString();
 
-    if (debugSpecial)
-    {
-        SerialMon.print("--------------\nStore Message ");
-        SerialMon.print(++messageNbr);
-        SerialMon.println(":");
-        SerialMon.print("From: ");
-        SerialMon.println(sender);
-
-        std::string dts = dtSentAt.toString();
-        SerialMon.print("Sent at: ");
-        SerialMon.println(dts.c_str());
-
-        SerialMon.println("Message:");
-        SerialMon.print(message);
-        SerialMon.println("-------");
-    }
+    // LOG("------------------\nStore Message %d: From: %s\n", highestID, sender);
+    // LOG("Sent at: %s\nMessage:\n%s ---------------\n", dts.c_str(), message);
+    LOG_EXIT();
 }
 
 //---------------------------------
@@ -376,6 +369,7 @@ bool BensSim::handleSMSintro(char *line, char **status, char **sender, char **se
 //---------------------------
 void BensSim::extractAllMessages(char *buffer)
 {
+    LOG_ENTRY();
     char *b_store;
     char *line;
     const char *crlf = "\r\n";
@@ -437,30 +431,50 @@ void BensSim::extractAllMessages(char *buffer)
             inProgress = false;
         }
     }
+    LOG_EXIT();
 }
 
 //-----------------------
 void BensSim::getAllSMSes()
 {
-
+    LOG_ENTRY();
     pSIM->clearBuffer();
 
-    if (debug)
-        SerialMon.println("Handle unsolicited messages");
     handleUnsolicited();
 
-    if (debug)
-        SerialMon.println("Getting list of all SMS'es (smsList)...");
     pSIM->formatReply(false);
     pSIM->smsList(SET, "\"ALL\"");
     reportIfError("smsList");
 
     if (isOK())
     {
-        if (debug)
-            SerialMon.println("Extract messages");
+        LOG("Extract messages from buffer: \n%s\n", pSIM->getBuffer());
         extractAllMessages(pSIM->getBuffer());
-        if (debug)
-            SerialMon.println("extract done");
     }
+    LOG_EXIT();
+}
+
+//-----------------------
+void BensSim::deleteAllSMSes()
+{
+    LOG_ENTRY();
+
+    pSIM->smsDel(SET, "1,3");
+
+
+    // TODO- deze functie aanpassen!
+    // pSIM->clearBuffer();
+
+    // handleUnsolicited();
+
+    // pSIM->formatReply(false);
+    // pSIM->smsList(SET, "\"ALL\"");
+    // reportIfError("smsList");
+
+    // if (isOK())
+    // {
+    //     LOG("Extract messages from buffer: \n%s\n", pSIM->getBuffer());
+    //     extractAllMessages(pSIM->getBuffer());
+    // }
+    LOG_EXIT();
 }

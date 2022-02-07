@@ -15,14 +15,14 @@ public:
 	BensMessageImpl (MessageID id, DateTime sentAt, const std::string &sender,	const std::string &body);
 	virtual ~BensMessageImpl();
 
-	virtual MessageID          getMessageID () const;
-	virtual bool               isValid      () const;
-    virtual const DateTime&    getSentAt    () const;
-	virtual const std::string& getSender    () const;
-	virtual const std::string& getBody      () const;
-	virtual const std::string& getAction    () const; // Should be 'subscribe', 'unsubscribe'
-	virtual const std::string& getStart     () const; // Should be in hh:mm or ''
-	virtual const std::string& getEnd       () const; // Should be in hh:mm or ''
+	virtual MessageID          getMessageID    () const;
+	virtual bool               isValid         () const;
+    virtual const DateTime&    getSentAt       () const;
+	virtual const std::string& getSender       () const;
+	virtual const std::string& getBody         () const;
+	virtual const std::string& getAction       () const; // Should be 'subscribe', 'unsubscribe'
+	virtual const std::string& getStart        () const; // Should be in hh:mm or ''
+	virtual const std::string& getEnd          () const; // Should be in hh:mm or ''
 
 private:
 	MessageID   messageID;

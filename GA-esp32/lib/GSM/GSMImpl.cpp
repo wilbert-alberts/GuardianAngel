@@ -80,6 +80,7 @@ std::vector<MessageID> GSMImpl::getMessageIDs() {
 		auto myMsg = MessageFactory::createMessage(bm->getMessageID(), bm->getSender(), bm->getBody());
 		messages.push_back(myMsg);
 	});
+
 	LOG("bensMessages transformed in myMessages");
 
 	// Extract message ids
@@ -88,34 +89,44 @@ std::vector<MessageID> GSMImpl::getMessageIDs() {
 				result.push_back(m->getMessageID());
 			});
 	LOG("message ids extracted");
-	LOG_EXIT();
+	LOG_EXIT("nrMessageIDs: %d", result.size());
 	return result;
 
 }
 
 std::shared_ptr<IMessage> GSMImpl::getMessage(const MessageID mid) const {
+	LOG_ENTRY("msgID: %d", mid);
 	auto msg = std::find_if(messages.begin(), messages.end(),
 			[&](std::shared_ptr<IMessage> m) {
 				return m->getMessageID() == mid;
 			});
 
+	std::shared_ptr<IMessage> result;
 	if (msg != messages.end()) {
-		return *msg;
+		result =  *msg;
 	} else {
-		return std::shared_ptr<IMessage>(nullptr);
+		result =  std::shared_ptr<IMessage>(nullptr);
 	}
+
+	LOG_EXIT("todo: log message content");
+	return result;
 }
 
 void GSMImpl::delMessage(const MessageID mid) {
+	LOG_ENTRY("msgID: %d", mid);
 	auto newEnd = std::remove_if(messages.begin(), messages.end(),
 			[&](std::shared_ptr<IMessage> m) {
 				return m->getMessageID() == mid;
 			});
 
 	messages.erase(newEnd, messages.end());
+	LOG_EXIT();
 }
 
 void GSMImpl::sendMessage(const std::string &phoneNr, const std::string& msg) {
+	LOG_ENTRY("phoneNr: %s, msg: %s", phoneNr.c_str(), msg.c_str());
+	LOG("Message sending not implemented yet!");
+	LOG_EXIT();
 }
 
 std::shared_ptr<Time24> GSMImpl::getTime() const {

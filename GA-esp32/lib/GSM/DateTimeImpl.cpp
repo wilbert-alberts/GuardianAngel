@@ -10,7 +10,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <sstream>
-// #include <Arduino.h>  // for Serial.println
 
 #include "DateTime.hpp"
 
@@ -86,11 +85,14 @@ static int daysInYear(int year)
    return isLeap(year) ? 366 : 365;
 }
 
+#ifdef NOTUSED
 //-----------------
-static int dstToSeconds(int dst)
+static int tzToSeconds(int tz)
 {
-   return dst * 15 * 60;
+   return tz * 15 * 60;
 }
+#endif
+
 
 //--------------------------------------
 static bool stringToComps(std::string s, int &year, int &month, int &day, int &hour, int &min, int &sec, int &tz)
@@ -212,9 +214,9 @@ static void verifyIntegrity(int yy, int mm, int dd, int h, int m, int s, int tz)
    checkRange(tz, -8, 8);
 }
 
+
+
 //------------------
-
-
 static int YMDtoDays(int yy, int mm, int dd)
 {
    int days = 0;
@@ -229,17 +231,19 @@ static int YMDtoDays(int yy, int mm, int dd)
    return days;
 }
 
-static int HMStoSeconds(int h, int m, int s, int dst) {
-   return  (h * 60 + m) * 60 + s + dstToSeconds(dst);
+//------------------
+static int HMStoSeconds(int h, int m, int s, int tz) {
+// turns out that date/time already incorporates the timezone
+   return  (h * 60 + m) * 60 + s;     // + tzToSeconds(tz);
 }
 
-
-DateTime::DateTime(int yy, int mm, int dd, int h, int m, int s, int dst)
+//------------------
+DateTime::DateTime(int yy, int mm, int dd, int h, int m, int s, int tz)
 {
-   verifyIntegrity(yy, mm, dd, h, m, s, dst);
+   verifyIntegrity(yy, mm, dd, h, m, s, tz);
 
-   days = YMDtoDays(yy, mm, dd);
-   seconds = HMStoSeconds(h, m, s, dst);
+   days    = YMDtoDays    (yy, mm, dd);
+   seconds = HMStoSeconds (h, m, s, tz);
    normalize();
 }
 
@@ -247,7 +251,7 @@ DateTime::DateTime(std::string str)
 {
    int yy, mm, dd, h, m, s, tz;
    stringToComps(str, yy, mm, dd, h, m, s, tz);
-   days = YMDtoDays(yy, mm, dd);
+   days    = YMDtoDays(yy, mm, dd);
    seconds = HMStoSeconds(h,m,s,tz);
    normalize();
 }

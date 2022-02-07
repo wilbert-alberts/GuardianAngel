@@ -5,47 +5,62 @@
  *      Author: wilbert
  */
 
+#include "platform.hpp"
 #include <HelpButton.hpp>
 #include <PeriodicTask.hpp>
 #include <algorithm>
 #include <iterator>
 
-HelpButton::HelpButton(ValueProvider vp) :
-		activityDebouncer(5, [=]() -> int {
-			return vp();
-		}) {
-
+HelpButton::HelpButton(ValueProvider vp) : activityDebouncer(5, [=]() -> int
+															 { return vp(); })
+{
+	LOG_ENTRY();
+	LOG_EXIT();
 }
 
-HelpButton::~HelpButton() {
-
+HelpButton::~HelpButton()
+{
+	LOG_ENTRY();
+	LOG_EXIT();
 }
 
-PeriodicTask* HelpButton::createTask() {
+PeriodicTask *HelpButton::createTask()
+{
 	return new PeriodicTask("helpButton", std::shared_ptr<ITicking>(this), 10, 4000);
 }
 
-void HelpButton::addListener(std::shared_ptr<IBtnListener> listener) {
+void HelpButton::addListener(std::shared_ptr<IBtnListener> listener)
+{
+	LOG_ENTRY("nrListeners: %d", listeners.size());
 	listeners.push_back(listener);
+	LOG_EXIT("nrListeners: %d", listeners.size());
 }
 
-void HelpButton::delListener(std::shared_ptr<IBtnListener> listener) {
+void HelpButton::delListener(std::shared_ptr<IBtnListener> listener)
+{
+	LOG_ENTRY("nrListeners: %d", listeners.size());
 	auto newEnd = std::remove_if(listeners.begin(), listeners.end(),
-			[&](std::shared_ptr<IBtnListener> el) {
-				return el == listener;
-			});
+								 [&](std::shared_ptr<IBtnListener> el)
+								 {
+									 return el == listener;
+								 });
 	listeners.erase(newEnd, listeners.end());
+	LOG_EXIT("nrListeners: %d", listeners.size());
 }
 
-void HelpButton::notifyListeners() {
-	std::for_each(listeners.begin(), listeners.end(), [](std::shared_ptr<IBtnListener> l) {
-		l->btnPressed();
-	});
+void HelpButton::notifyListeners()
+{
+	LOG_ENTRY("nrListeners: %d", listeners.size());
+	std::for_each(listeners.begin(), listeners.end(), [](std::shared_ptr<IBtnListener> l)
+				  { l->btnPressed(); });
+	LOG_EXIT();
 }
 
-void HelpButton::tick() {
+void HelpButton::tick()
+{
 	bool changed = activityDebouncer.tick();
-	if (changed) {
+	if (changed)
+	{
 		notifyListeners();
 	}
 }

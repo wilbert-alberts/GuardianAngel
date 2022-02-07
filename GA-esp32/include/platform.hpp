@@ -11,6 +11,8 @@
 
 // 'undefine' GA_POSIX for AVR ESP32 platform.
 
+#define boolToString(x) ((x) ? "true":"false")
+
 #ifdef GA_POSIX
 
 #include <pthread.h>
