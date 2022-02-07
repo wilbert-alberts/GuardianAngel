@@ -44,7 +44,7 @@ void SIM800::smsRead(CmdType type, const char* str) {
 }
 
 // ============================================================
-void SIM800::smsSend(char* addr_len, char* txt_pdu) {
+void SIM800::smsSend(const char* addr_len, const char* txt_pdu) {
     outBuilder(EXE, addr_len, P("AT+CMGS="), false);
     smsHelper(txt_pdu);
 }
@@ -117,7 +117,7 @@ void SIM800::smsService(CmdType type, const char* str) {
 
 
 // ============================================================
-void SIM800::smsHelper(char* txt_pdu) {
+void SIM800::smsHelper(const char* txt_pdu) {
     strcat_P(ioBuffer, P("\r"));
     write(ioBuffer);
     delay(100);

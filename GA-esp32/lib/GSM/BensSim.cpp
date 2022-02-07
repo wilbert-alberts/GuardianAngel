@@ -223,7 +223,7 @@ bool BensSim::sayHello()
 
     if (i >= maxi)
     {
-        LOG ("********* ERROR: sayHello: no OK reply\n");
+        LOG("********* ERROR: sayHello: no OK reply\n");
         success = false;
     }
     pSIM->resetTimeout(); // normal timeout
@@ -269,22 +269,17 @@ void BensSim::setupGSM(const char *pincode)
 }
 
 //---------------------------
-void BensSim::sendSMS(char *recipientNumber, char *sms)
+void BensSim::sendSMS(const char *recipientNumber, const char *sms)
 {
     LOG_ENTRY("recipientNr: %s, msg: %s", recipientNumber, sms);
     const int maxLen = 153;
     char buffer[maxLen + 1];
-    int nSMS = 0;
-    while ((strlen(sms)) > 0)
-    {
-        strncpy(buffer, sms, maxLen);
-        pSIM->smsSend(recipientNumber, buffer);
-        reportIfError("SMS Send");
-        sms += strlen(buffer);
 
-        if (++nSMS > 3)
-            break;
-    }
+    strncpy(buffer, sms, maxLen);
+    buffer[maxLen] = 0;
+    pSIM->smsSend(recipientNumber, buffer);
+    reportIfError("SMS Send");
+
     LOG_EXIT();
 }
 
@@ -460,7 +455,6 @@ void BensSim::deleteAllSMSes()
     LOG_ENTRY();
 
     pSIM->smsDel(SET, "1,3");
-
 
     // TODO- deze functie aanpassen!
     // pSIM->clearBuffer();

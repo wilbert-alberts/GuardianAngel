@@ -25,7 +25,8 @@ public:
       return messages;
    }
    void getTime(int &h, int &m, int &s);
-
+   void sendSMS(const char *recipientNumber, const char *sms);
+   
 private:
    void setupModem();
    bool isOK();

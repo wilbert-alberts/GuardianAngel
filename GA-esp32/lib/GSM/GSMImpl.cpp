@@ -125,7 +125,7 @@ void GSMImpl::delMessage(const MessageID mid) {
 
 void GSMImpl::sendMessage(const std::string &phoneNr, const std::string& msg) {
 	LOG_ENTRY("phoneNr: %s, msg: %s", phoneNr.c_str(), msg.c_str());
-	LOG("Message sending not implemented yet!");
+	bs.sendSMS(("\""+phoneNr+"\"").c_str(), msg.c_str());
 	LOG_EXIT();
 }
 

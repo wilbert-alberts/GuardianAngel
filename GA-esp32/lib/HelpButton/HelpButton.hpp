@@ -19,7 +19,7 @@ class PeriodicTask;
 
 class HelpButton: public IButton, public ITicking {
 public:
-	HelpButton(ValueProvider vp);
+	HelpButton();
 	virtual ~HelpButton();
 	virtual PeriodicTask* createTask();
 	virtual void addListener(std::shared_ptr<IBtnListener> listener);
@@ -34,7 +34,7 @@ private:
 };
 
 namespace HelpButtonFactory {
-std::shared_ptr<IButton> create(ValueProvider vp);
+std::shared_ptr<IButton> create();
 }
 
 #endif /* LIB_HELPBUTTON_HELPBUTTON_HPP_ */

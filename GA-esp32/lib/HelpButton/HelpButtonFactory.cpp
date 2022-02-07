@@ -12,8 +12,8 @@
 
 
 namespace HelpButtonFactory {
-std::shared_ptr<IButton> create(ValueProvider vp) {
-	return std::shared_ptr<IButton>(new HelpButton(vp));
+std::shared_ptr<IButton> create() {
+	return std::shared_ptr<IButton>(new HelpButton());
 }
 
 }

@@ -25,7 +25,7 @@ public:
     /* AT+CMGF    113 */    void smsFormat         (CmdType, const char* = "");
     /* AT+CMGL    114 */    void smsList           (CmdType, const char* = "");
     /* AT+CMGR    117 */    void smsRead           (CmdType, const char* = "");
-    /* AT+CMGS    120 */    void smsSend           (char*, char*);
+    /* AT+CMGS    120 */    void smsSend           (const char*, const char*);
     /* AT+CMGW    121 */    void smsWriteToStore   (char*, char*);
     /* AT+CMSS    123 */    void smsSendFromStore  (CmdType, const char* = "");
     /* AT+CNMI    124 */    void smsNotifyNew      (CmdType, const char* = "");
@@ -39,4 +39,4 @@ public:
     /* AT+CSMS    133 */    void smsService        (CmdType, const char* = "");
 
 private:
-    void smsHelper(char*);
+    void smsHelper(const char*);

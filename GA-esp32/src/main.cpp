@@ -25,7 +25,6 @@
 #include <memory>
 
 int readPIR();
-int readHelpBtn();
 void doWiring();
 
 static std::shared_ptr<IConfigProvider> configProvider;
@@ -96,23 +95,23 @@ void setup()
 	auto angelMgrTask = angelMgr->createTask();
 	angelMgrTask->startTask();
 
-	vTaskDelay(120 * 1000);
+	// vTaskDelay(120 * 1000);
 
-	LOG("Stopping.");
+	// LOG("Stopping.");
 
-	angelMgrTask->endTask();
-	delete angelMgrTask;
+	// angelMgrTask->endTask();
+	// delete angelMgrTask;
 
-	activityDetectorTask->endTask();
-	delete activityDetectorTask;
+	// activityDetectorTask->endTask();
+	// delete activityDetectorTask;
 	
-	helpButtonTask->endTask();
-	delete helpButtonTask;
+	// helpButtonTask->endTask();
+	// delete helpButtonTask;
 
-	clockTask->endTask();
-	delete clockTask;
+	// clockTask->endTask();
+	// delete clockTask;
 
-	LOG("Stopped.");
+	// LOG("Stopped.");
 }
 
 void loop()
@@ -132,7 +131,7 @@ void doWiring() {
 	timeProvider->setGSM(gsm);
 
 	activityDetector = ActivityDetectorFactory::create(readPIR);
-	helpBtn = HelpButtonFactory::create(readHelpBtn);
+	helpBtn = HelpButtonFactory::create();
 
 	alarmProcessor = AlarmStationFactory::create();
 	alarmProcessor->setMessageSender(gsm);
@@ -153,6 +152,7 @@ int readPIR() {
 	return 0;
 }
 
-int readHelpBtn() {
-	return 0;
-}
+// int readHelpBtn() {
+// 	// Pin 21
+// 	return digitalRead(21);
+// }

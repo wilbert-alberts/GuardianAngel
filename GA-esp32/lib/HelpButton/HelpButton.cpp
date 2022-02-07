@@ -11,10 +11,11 @@
 #include <algorithm>
 #include <iterator>
 
-HelpButton::HelpButton(ValueProvider vp) : activityDebouncer(5, [=]() -> int
-															 { return vp(); })
+HelpButton::HelpButton() : activityDebouncer(5, [=]() -> int
+															 { return digitalRead(21); })
 {
 	LOG_ENTRY();
+	pinMode(21, INPUT_PULLUP);
 	LOG_EXIT();
 }
 

@@ -51,13 +51,14 @@ void ConfigImpl::saveProperties(const std::string& props) {
 
 #include <EEPROM.h>
 
-#define CLEAR_EPROM
+#define CLEAR_EPROM_NOT_NOW
 
 #ifdef CLEAR_EPROM
 ConfigImpl::ConfigImpl() {
 	LOG_ENTRY();
 	EEPROM.begin(4096);
-	EEPROM.writeString(0, "");
+	EEPROM.writeString(0, "{}");
+	EEPROM.commit();
 	LOG_EXIT();
 }
 #else
@@ -83,6 +84,7 @@ void ConfigImpl::saveProperties(const std::string& props) {
 	LOG_ENTRY();
 	LOG("props: %s", props.c_str());
 	EEPROM.writeString(0, props.c_str());
+	EEPROM.commit();
 	LOG_EXIT();
 }
 
