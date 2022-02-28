@@ -60,7 +60,7 @@ void HelpButton::notifyListeners()
 void HelpButton::tick()
 {
 	bool changed = activityDebouncer.tick();
-	if (changed)
+	if (changed && activityDebouncer.getValue() == 0)
 	{
 		notifyListeners();
 	}

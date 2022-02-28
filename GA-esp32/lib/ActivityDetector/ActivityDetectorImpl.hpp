@@ -15,7 +15,7 @@
 
 class ActivityDetectorImpl: public IActivityDetector, public ITicking {
 public:
-	ActivityDetectorImpl(ValueProvider vp);
+	ActivityDetectorImpl();
 	virtual ~ActivityDetectorImpl() {
 	}
 	virtual PeriodicTask* createTask();

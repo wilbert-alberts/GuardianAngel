@@ -24,6 +24,9 @@ public:
       LOG_EXIT();
       return messages;
    }
+   void deleteAllMessages() {
+      messages.clear();
+   }
    void getTime(int &h, int &m, int &s);
    void sendSMS(const char *recipientNumber, const char *sms);
    

@@ -12,11 +12,13 @@
 
 class IActivityDetector;
 
-ActivityDetectorImpl::ActivityDetectorImpl(ValueProvider vp) :
+ActivityDetectorImpl::ActivityDetectorImpl() :
 		nrActivations(0), activityDebouncer(5, [=]() -> int {
-			return vp();
+			return digitalRead(22);
 		}) {
-
+	LOG_ENTRY();
+	pinMode(22, INPUT_PULLDOWN);
+	LOG_EXIT();
 }
 
 PeriodicTask* ActivityDetectorImpl::createTask() {
@@ -46,8 +48,8 @@ int ActivityDetectorImpl::getNrActivations() {
 
 namespace ActivityDetectorFactory {
 
-std::shared_ptr<IActivityDetector> create(ValueProvider vp) {
-	return std::shared_ptr<IActivityDetector>(new ActivityDetectorImpl(vp));
+std::shared_ptr<IActivityDetector> create() {
+	return std::shared_ptr<IActivityDetector>(new ActivityDetectorImpl());
 }
 
 }

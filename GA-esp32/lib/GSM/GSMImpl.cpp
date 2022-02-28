@@ -30,106 +30,144 @@
 
 #endif
 
-class GSMImpl: public GSM {
+class GSMImpl : public GSM
+{
 public:
 	GSMImpl();
-	~GSMImpl() {
+	~GSMImpl()
+	{
 	}
 	virtual std::vector<MessageID> getMessageIDs();
 	virtual std::shared_ptr<IMessage> getMessage(const MessageID mid) const;
 	virtual void delMessage(const MessageID mid);
-	virtual void sendMessage(const std::string &phoneNr, const std::string& msg);
+	virtual void sendMessage(const std::string &phoneNr, const std::string &msg);
 	virtual std::shared_ptr<Time24> getTime() const;
 
 private:
+	void enterCS() const;
+	void exitCS() const;
 	std::vector<std::shared_ptr<IMessage>> messages;
 	static BensSim bs;
 	static boolean bensSimBeginCalled;
+	static SemaphoreHandle_t mx;
 };
 
-// TODO: find way to configure PIN 
-char bensPin[]="2881";
-BensSim GSMImpl::bs (&SIM, bensPin);
+// TODO: find way to configure PIN
+char bensPin[] = "2881";
+BensSim GSMImpl::bs(&SIM, bensPin);
 boolean GSMImpl::bensSimBeginCalled(false);
+SemaphoreHandle_t GSMImpl::mx;
 
-namespace GSMFactory {
-std::shared_ptr<GSM> create() {
-	return std::shared_ptr<GSM>(new GSMImpl());
-}
+namespace GSMFactory
+{
+	std::shared_ptr<GSM> create()
+	{
+		return std::shared_ptr<GSM>(new GSMImpl());
+	}
 }
 
-GSMImpl::GSMImpl() {
+GSMImpl::GSMImpl()
+{
 	LOG_ENTRY();
-	if (!bensSimBeginCalled) {
+	if (!bensSimBeginCalled)
+	{
 		bs.begin();
 		bensSimBeginCalled = true;
+		mx = xSemaphoreCreateMutex();
 	}
 	LOG_EXIT();
 }
 
-std::vector<MessageID> GSMImpl::getMessageIDs() {
+void GSMImpl::enterCS() const
+{
+
+	while (!xSemaphoreTake(mx, portMAX_DELAY))
+		;
+}
+
+void GSMImpl::exitCS() const
+{
+	xSemaphoreGive(mx);
+}
+
+std::vector<MessageID> GSMImpl::getMessageIDs()
+{
 	LOG_ENTRY();
 	std::vector<MessageID> result;
 
 	// Retrieve messages from BensSim and store in messages
+	enterCS();
 	auto bensMessages = bs.getMessages();
+	bs.deleteAllMessages();
+	exitCS();
 	LOG("bensMessages retrieved");
 
 	messages.clear();
-	std::for_each(bensMessages.begin(), bensMessages.end(), [&](std::shared_ptr<BensMessage> bm){
+	std::for_each(bensMessages.begin(), bensMessages.end(), [&](std::shared_ptr<BensMessage> bm)
+				  {
 		auto myMsg = MessageFactory::createMessage(bm->getMessageID(), bm->getSender(), bm->getBody());
-		messages.push_back(myMsg);
-	});
+		messages.push_back(myMsg); });
 
 	LOG("bensMessages transformed in myMessages");
 
 	// Extract message ids
 	std::for_each(messages.begin(), messages.end(),
-			[&](std::shared_ptr<IMessage> m) {
-				result.push_back(m->getMessageID());
-			});
+				  [&](std::shared_ptr<IMessage> m)
+				  {
+					  result.push_back(m->getMessageID());
+				  });
 	LOG("message ids extracted");
 	LOG_EXIT("nrMessageIDs: %d", result.size());
 	return result;
-
 }
 
-std::shared_ptr<IMessage> GSMImpl::getMessage(const MessageID mid) const {
+std::shared_ptr<IMessage> GSMImpl::getMessage(const MessageID mid) const
+{
 	LOG_ENTRY("msgID: %d", mid);
 	auto msg = std::find_if(messages.begin(), messages.end(),
-			[&](std::shared_ptr<IMessage> m) {
-				return m->getMessageID() == mid;
-			});
+							[&](std::shared_ptr<IMessage> m)
+							{
+								return m->getMessageID() == mid;
+							});
 
 	std::shared_ptr<IMessage> result;
-	if (msg != messages.end()) {
-		result =  *msg;
-	} else {
-		result =  std::shared_ptr<IMessage>(nullptr);
+	if (msg != messages.end())
+	{
+		result = *msg;
+	}
+	else
+	{
+		result = std::shared_ptr<IMessage>(nullptr);
 	}
 
 	LOG_EXIT("todo: log message content");
 	return result;
 }
 
-void GSMImpl::delMessage(const MessageID mid) {
+void GSMImpl::delMessage(const MessageID mid)
+{
 	LOG_ENTRY("msgID: %d", mid);
 	auto newEnd = std::remove_if(messages.begin(), messages.end(),
-			[&](std::shared_ptr<IMessage> m) {
-				return m->getMessageID() == mid;
-			});
+								 [&](std::shared_ptr<IMessage> m)
+								 {
+									 return m->getMessageID() == mid;
+								 });
 
 	messages.erase(newEnd, messages.end());
 	LOG_EXIT();
 }
 
-void GSMImpl::sendMessage(const std::string &phoneNr, const std::string& msg) {
+void GSMImpl::sendMessage(const std::string &phoneNr, const std::string &msg)
+{
 	LOG_ENTRY("phoneNr: %s, msg: %s", phoneNr.c_str(), msg.c_str());
-	bs.sendSMS(("\""+phoneNr+"\"").c_str(), msg.c_str());
+	enterCS();
+	bs.sendSMS(("\"" + phoneNr + "\"").c_str(), msg.c_str());
+	exitCS();
 	LOG_EXIT();
 }
 
-std::shared_ptr<Time24> GSMImpl::getTime() const {
+std::shared_ptr<Time24> GSMImpl::getTime() const
+{
 	LOG_ENTRY();
 
 	int h = 1;
@@ -146,11 +184,12 @@ std::shared_ptr<Time24> GSMImpl::getTime() const {
 	s = lt->tm_sec;
 
 #else
-	bs.getTime(h,m,s);
+	enterCS();
+	bs.getTime(h, m, s);
+	exitCS();
 #endif
 
 	std::shared_ptr<Time24> result = Time24Factory::create(h, m, s);
 	LOG_EXIT("time: %s", result->toString().c_str());
 	return result;
-
 }

@@ -116,7 +116,7 @@ void BensSim::reportIfError(const char *msg)
 {
     if (pSIM->isError())
     {
-        LOG("----ERROR----\n%s yielded: %s \n--------------\n", msg, pSIM->getBuffer());
+        // LOG("----ERROR----\n%s yielded: %s \n--------------\n", msg, pSIM->getBuffer());
     }
 }
 
@@ -157,25 +157,25 @@ void BensSim::getTime(int &h, int &m, int &s)
 {
     LOG_ENTRY();
     pSIM->formatReply(true);
-    LOG("Sending +CCLK");
+    // LOG("Sending +CCLK");
     pSIM->clock(GET);
     if (pSIM->reply("+CCLK"))
     {
         char *buffer = strstr(pSIM->getBuffer(), "+CCLK: \"");
         char *token = buffer + strlen("+CCLK: \"");
-        LOG("token: %s", token);
+        // LOG("token: %s", token);
         std::string myTime(token);
-        LOG("myTime: %s", myTime.c_str());
+        // LOG("myTime: %s", myTime.c_str());
         DateTime dt(myTime);
-        LOG("dt: %s", dt.toString().c_str());
+        // LOG("dt: %s", dt.toString().c_str());
         dt.getHMS(h, m, s);
-        LOG("h: %d, m: %d, s: %d", h, m, s);
+        // LOG("h: %d, m: %d, s: %d", h, m, s);
     }
     else
     {
-        LOG("No +CCLK reply received.");
+        // LOG("No +CCLK reply received.");
     }
-    LOG("+CCLK reply received.");
+    // LOG("+CCLK reply received.");
 
     // token = strtok(NULL, "\r\n");
     LOG_EXIT("hh:mm::ss", h, m, s);
@@ -184,21 +184,38 @@ void BensSim::getTime(int &h, int &m, int &s)
 //----------------------
 void BensSim::handleUnsolicited()
 {
+    LOG_ENTRY();
+    // LOG("A");
     if (!pSIM->available())
+    {
+        // LOG("B");
+        LOG_EXIT();
         return;
+    }
+    // LOG("C");
     pSIM->formatReply(false);
+    // LOG("D");
     while (pSIM->available())
     {
+        // LOG("E");
         if (pSIM->reply("TIMEOUT"))
         {
+            // LOG("F");
             pSIM->clearBuffer();
             break;
         }
+        // LOG("G");
 
         handleUnsolicitedMessage(pSIM->getBuffer());
+        // LOG("H");
+
         pSIM->clearBuffer();
+        // LOG("I");
     }
+    // LOG("J");
     pSIM->formatReply(true);
+    // LOG("K");
+    LOG_EXIT();
 }
 
 //----------------------
@@ -223,7 +240,7 @@ bool BensSim::sayHello()
 
     if (i >= maxi)
     {
-        LOG("********* ERROR: sayHello: no OK reply\n");
+        // LOG("********* ERROR: sayHello: no OK reply\n");
         success = false;
     }
     pSIM->resetTimeout(); // normal timeout
@@ -298,8 +315,8 @@ void BensSim::storeMessage(char *sender, char *sentAt, char *message)
 
     std::string dts = dtSentAt.toString();
 
-    // LOG("------------------\nStore Message %d: From: %s\n", highestID, sender);
-    // LOG("Sent at: %s\nMessage:\n%s ---------------\n", dts.c_str(), message);
+    // // LOG("------------------\nStore Message %d: From: %s\n", highestID, sender);
+    // // LOG("Sent at: %s\nMessage:\n%s ---------------\n", dts.c_str(), message);
     LOG_EXIT();
 }
 
@@ -434,18 +451,25 @@ void BensSim::getAllSMSes()
 {
     LOG_ENTRY();
     pSIM->clearBuffer();
+    // // LOG("(1)");
 
     handleUnsolicited();
+    // // LOG("(2)");
 
     pSIM->formatReply(false);
+    // // LOG("(3)");
     pSIM->smsList(SET, "\"ALL\"");
+    // // LOG("(4)");
     reportIfError("smsList");
+    // // LOG("(5)");
 
     if (isOK())
     {
-        LOG("Extract messages from buffer: \n%s\n", pSIM->getBuffer());
+        // // LOG("(6) Extract messages from buffer: \n%s\n", pSIM->getBuffer());
         extractAllMessages(pSIM->getBuffer());
+        // // LOG("(7)");
     }
+    // // LOG("(8)");
     LOG_EXIT();
 }
 
@@ -467,7 +491,7 @@ void BensSim::deleteAllSMSes()
 
     // if (isOK())
     // {
-    //     LOG("Extract messages from buffer: \n%s\n", pSIM->getBuffer());
+    //     // LOG("Extract messages from buffer: \n%s\n", pSIM->getBuffer());
     //     extractAllMessages(pSIM->getBuffer());
     // }
     LOG_EXIT();

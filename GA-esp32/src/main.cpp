@@ -24,7 +24,9 @@
 #include <iostream>
 #include <memory>
 
-int readPIR();
+#include <esp_task_wdt.h>
+
+
 void doWiring();
 
 static std::shared_ptr<IConfigProvider> configProvider;
@@ -81,6 +83,7 @@ void setup()
 	LOG("Starting.");
 
 	doWiring();
+    esp_task_wdt_init(10, true);
 
 	// Create active processes
 	auto clockTask = timeProvider->createTask();
@@ -130,7 +133,7 @@ void doWiring() {
 	timeProvider = ClockFactory::create();
 	timeProvider->setGSM(gsm);
 
-	activityDetector = ActivityDetectorFactory::create(readPIR);
+	activityDetector = ActivityDetectorFactory::create();
 	helpBtn = HelpButtonFactory::create();
 
 	alarmProcessor = AlarmStationFactory::create();
@@ -148,11 +151,3 @@ void doWiring() {
 
 }
 
-int readPIR() {
-	return 0;
-}
-
-// int readHelpBtn() {
-// 	// Pin 21
-// 	return digitalRead(21);
-// }
